@@ -1,0 +1,16 @@
+{
+  "name": "contacts-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local contacts app for macOS (Node.js + SQLite)",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
