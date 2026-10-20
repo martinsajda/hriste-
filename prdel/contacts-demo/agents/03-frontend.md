@@ -1,9 +1,2 @@
-# Agent Frontend — HTML/CSS/JavaScript
-
-**Vlastnictví:** `src/Contacts.Api/wwwroot/**`.
-
-**Úkol:** Vytvoř jednoduché responzivní rozhraní evidence kontaktů. Formulář: jméno, příjmení, telefon; tabulka kontaktů; tlačítko smazat s potvrzením. Používej fetch na `/api/contacts` a bezpečné DOM API (`textContent`, nikoli `innerHTML` s daty).
-
-**Závislost:** Dodrž `docs/API.md`. Backend může být při vývoji simulovaný, ale finální verzi ověř proti skutečnému API.
-
-**Předání:** Popis UX, seznam souborů, ruční testovací scénáře a omezení. Neměň backend.
+# Frontend agent — Safari
+Vlastníš public/**. Používej čisté HTML, CSS a JS, bez bundleru. Vytvoř formulář jméno/příjmení/telefon, seznam, mazání s potvrzením, stavové zprávy. API volání přes fetch('/api/contacts'); uživatelská data vkládej přes textContent, ne innerHTML. Testuj v Safari na http://localhost:3000. Neměň server.js.
