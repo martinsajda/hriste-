@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence kontaktů</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><h1>Evidence kontaktů</h1>
+<form id="contactForm"><label>Jméno<input name="firstName" maxlength="100" required></label>
+<label>Příjmení<input name="lastName" maxlength="100" required></label>
+<label>Telefon<input name="phone" type="tel" maxlength="40" required></label>
+<button type="submit">Přidat kontakt</button></form>
+<p id="message" role="status" aria-live="polite"></p>
+<table><thead><tr><th>Jméno</th><th>Příjmení</th><th>Telefon</th><th>Akce</th></tr></thead><tbody id="contacts"></tbody></table>
+</main><script src="/app.js" defer></script></body></html>
