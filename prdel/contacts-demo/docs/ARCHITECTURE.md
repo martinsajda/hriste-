@@ -33,4 +33,4 @@ První verze poslouchá pouze na `127.0.0.1`, nemá autentizaci ani šifrování
 
 ## Stav implementace
 
-Dosavadní `server.js` je **starý prototyp** s jedinou tabulkou, číselnými ID a omezeným API. Zatím neodpovídá schválenému datovému modelu ani REST kontraktu. Tento dokument popisuje **cílovou architekturu**, ne hotovou implementaci.
+Tento dokument je **závazný popis cílové architektury**, nikoli potvrzení hotové implementace. Datový model a REST API jsou schváleny; finální JSON schéma rendereru ještě čeká na schválení. Existující implementaci je nutné uvést do souladu s těmito kontrakty.
