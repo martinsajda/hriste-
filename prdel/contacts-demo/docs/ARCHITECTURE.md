@@ -50,3 +50,18 @@ JSON klíče a technické identifikátory se porovnávají case-sensitive. Nepro
 - SQL/ERD/UML generátory používají kanonické logické názvy a explicitní mapování.
 - Schválené názvy SQL (`Contacts`, `FirstName`, `ContactId`) a REST API (`firstName`, `contactId`) zůstávají zachovány. Například logické `firstname` se explicitně mapuje na SQL `FirstName` a API `firstName`. Toto pravidlo nezpůsobuje migraci ani změnu API.
 - JSONC je dokumentační formát; běhová metadata jsou validní JSON.
+
+
+## ADR-2026-10-21: Dataverse SDK jako referenční metadatový a datový model
+
+**Stav: SCHVÁLENO — závazné architektonické rozhodnutí.**
+
+Pro všechny model-driven komponenty je referenčním doménovým modelem **Microsoft Dynamics 365 / Dataverse SDK**, zejména `Microsoft.Xrm.Sdk` a `Microsoft.Xrm.Sdk.Metadata`. Naše platformově nezávislá JSON reprezentace zachovává typovou informaci, význam, identitu, null/absent sémantiku a vazby objektů SDK; není nutně doslovnou kopií interní .NET serializace ani Dataverse OData Web API. Nezavádíme konkurenční zjednodušený metamodel.
+
+**Motivace:** Portály vyvíjené nad demonstračními JSON/SQLite daty musí být přenositelné na skutečný Dynamics 365/Dataverse. Za stejnými REST/JSON kontrakty lze vyměnit provider za implementaci nad FetchXML a SDK `EntityCollection` / `Entity` bez přepisu grid/form/lookup rendererů.
+
+**Normativní podrobnosti, typová matice, JSONC příklady, mapování a akceptační pravidla:** [METADATA_MODEL.md](METADATA_MODEL.md).
+
+**Důsledky a hranice:** Metadata entity, atributů, relací a option setů jsou oddělena od záznamů. Layout formulářů a gridů je další samostatná vrstva. `EntityReference`, `Money`, `OptionSetValue`, `OptionSetValueCollection`, `AliasedValue` a další SDK hodnotové objekty nesmějí být ztrátově redukovány na primitivní typy. Datové providery odpovídají za mapování fyzických SQLite/SQL/Dataverse typů na jednotný doménový kontrakt.
+
+**Řízení rozporů:** Starší návrhy s textovým option setem `TelephoneNumbers.Type`, plochými CRUD DTO nebo jinou strukturou jsou **legacy kontrakty**, nikoliv definice cílového model-driven kontraktu. Stávající implementace a endpointy se nemění automaticky tímto ADR; před implementací je nutná explicitní migrační specifikace. Předchozí konvence camelCase JSON vlastností a lowercase logických názvů platí, pokud nekolidují s věrností SDK sémantice; originální názvy SDK jsou dokumentovány a jejich JSON mapování je explicitní.
