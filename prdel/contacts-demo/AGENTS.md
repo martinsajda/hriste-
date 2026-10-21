@@ -10,9 +10,10 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 
 1. `README.md` — účel aplikace, UI a celkové zadání (schválené kontrakty mají přednost před ilustrativními ukázkami).
 2. `docs/DATOVY_MODEL.md` — závazné schéma dvou entit, GUID a vztah 1:N.
-3. `docs/API.md` — závazný REST API v1 kontrakt: 5 CRUD operací na entitu, celkem 10.
-4. `docs/ARCHITECTURE.md` — závazné technologické vrstvy a provoz.
-5. `DEPLOY.md` — odsouhlasený směr budoucího veřejného nasazení (bez dosud určených detailů).
+3. `docs/API.md` — závazný REST API v1 kontrakt: 5 CRUD operací na entitu, celkem 10, a schválené volitelné stránkování seznamů.
+4. `docs/GRID_METADATA.md` — schválená metadata gridů, klientské a serverové stránkování.
+5. `docs/ARCHITECTURE.md` — závazné technologické vrstvy a provoz.
+6. `DEPLOY.md` — odsouhlasený směr budoucího veřejného nasazení (bez dosud určených detailů).
 
 `HISTORIE.md` je archiv dialogu, nikoli závazná technická specifikace.
 
@@ -52,4 +53,4 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 
 ## Aktuální fáze
 
-Schváleny datový model, REST API, architektura a funkční požadavky UI. Schéma JSON metadat rendereru ještě není schváleno. Dalším krokem je jeho návrh a schválení, poté implementace. Nezaváděj multiagentní infrastrukturu.
+Schváleny datový model, REST API, architektura a funkční požadavky UI. Schéma metadat gridů v1 je schváleno, včetně klientského a serverového stránkování; metadata formulářů a další části rendereru zůstávají otevřené. Implementaci rendereru zatím nezačínej. Nezaváděj multiagentní infrastrukturu.
