@@ -69,3 +69,17 @@ Související dokumenty: GRID_METADATA.md, API.md, DATA_SOURCE_TESTING.md, ../sc
 - [ ] **Otevřené otázky:** jak reprezentovat lookup ID, zobrazovaný text a typ cílové entity; jak pojmenovat hodnoty z připojených entit (flat alias vs nested objekt); jak popsat navigační cíl; co s prázdným lookupem a případným polymorfním lookupem.
 
 **Vazby na backlog:** G01 (zdroj/prezentace sloupce), G02 (lookup), G03 (subgrid), G27 (parita mock/rest). Rozhodnutí přijmout až po návrhu entity a návratového JSON kontraktu.
+
+
+## Nový návrh G33 — události gridu a podmíněné formátování (2026-10-21)
+
+**Stav: poznámka k rozhodnutí; zatím neschválený kontrakt, bez změn JSON Schema nebo rendereru. Priorita P0 pro návrh rozhraní, implementaci lze fázovat.**
+
+- [ ] **G33 — Událostní model gridu.** Metadata mají umožnit navázání reakcí na události jako `onRowClick`, `onCurrentRowChanged`, `onSelectionChanged`, `onDataLoaded` a případně `onCellRender` (názvy jsou pracovní).
+- [ ] **Podmíněné formátování.** Deklarativní pravidla pro vzhled řádku nebo buňky podle hodnot záznamu (např. stav, termín, priorita), s použitím centrálních CSS tříd nebo pojmenovaných variant; bez inline libovolného JS.
+- [ ] **JavaScriptové handlery.** Umožnit reakci aplikační logiky na událost (např. po změně výběru aktualizovat jinou komponentu). Metadata by odkazovala na předem registrovanou funkci/handler podle identifikátoru; nespouštět kód přímo z JSON pomocí `eval`.
+- [ ] **Upřesnit rozdíly:** aktuální řádek (focus/current), vybrané řádky (selection), kliknutí a otevření záznamu nejsou totéž; definovat pořadí událostí, payload (grid ID, record ID, row data, selected IDs, kontext), synchronní/asynchronní handlery, možnost zrušení výchozí akce, chyby a životní cyklus.
+- [ ] **Kompatibilita režimů výběru:** `none`, `single`, `multiple`; při `none` nevzniká výběr, ale kliknutí/otevření a focus mohou fungovat samostatně.
+- [ ] **Bezpečnost a odpovědnosti:** renderer emituje události, aplikace registruje handlery; podmíněné formátování nesmí obcházet serverová oprávnění. Prověřit dopady na výkon při vykreslení mnoha buněk.
+
+**Návaznosti:** G01 (data sloupců), G05 (podmíněné akce), G14 (přístupnost), G17 (výběr), G28 (inline editace). Nejprve navrhnout kontrakt, potom teprve měnit metadata/schémata.
