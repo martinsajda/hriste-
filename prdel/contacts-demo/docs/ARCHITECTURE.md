@@ -38,3 +38,15 @@ Tento dokument je **závazný popis cílové architektury**, nikoli potvrzení h
 ## Rozhodnutí o vývoji rendereru bez databáze (21. 10. 2026)
 
 Frontend běží výhradně přes HTTP/HTTPS; `file://` ani zabalená metadata nejsou podporována. Metadata se vždy načítají přes `fetch()` ze statických JSON souborů. Pro data jsou pouze dva centrálně přepínané režimy: `mock` (statický JSON přes GET a klientský adaptér pro filtrování/stránkování, bez aplikačního backendu a DB) a `rest` (skutečné REST API a databáze). Lokálně stačí jednoduchý statický webserver; stejný frontend musí fungovat pod IIS nebo Apache. Podrobný závazný návrh: [DATA_SOURCE_TESTING.md](DATA_SOURCE_TESTING.md). Implementace je odložena.
+
+## Konvence názvů a case sensitivity (21. 10. 2026)
+
+JSON klíče a technické identifikátory se porovnávají case-sensitive. Neprovádí se automatická změna velikosti písmen.
+
+- Vlastnosti metamodelu a API: camelCase (`entityName`, `primaryKey`, `firstName`).
+- Logické názvy entit, atributů, relací a OptionSetů: lowercase, vzor `^[a-z][a-z0-9_]*$` (`contact`, `firstname`, `contact_company`).
+- Textové kódy OptionSetů jsou case-sensitive; číselné hodnoty jsou čísla. Zobrazované popisky a uživatelská data nemají omezení velikosti písmen.
+- Validátor odmítá chybné názvy a kolize i při porovnání bez ohledu na velikost písmen; hlásí cestu k chybě. Runtime názvy automaticky neopravuje.
+- SQL/ERD/UML generátory používají kanonické logické názvy a explicitní mapování.
+- Schválené názvy SQL (`Contacts`, `FirstName`, `ContactId`) a REST API (`firstName`, `contactId`) zůstávají zachovány. Například logické `firstname` se explicitně mapuje na SQL `FirstName` a API `firstName`. Toto pravidlo nezpůsobuje migraci ani změnu API.
+- JSONC je dokumentační formát; běhová metadata jsou validní JSON.
