@@ -85,7 +85,7 @@ Datový model v1 je **schválený** a jeho jediným závazným popisem je [DATOV
 - Vazba **Contacts 1:N TelephoneNumbers**; při smazání kontaktu se jeho telefony odstraní kaskádově.
 - Typ telefonu: `mobile`, `landline`, `fax`, `work`, `other`.
 
-Detail kontaktu umožní spravovat libovolný počet telefonů v subgridu. Aktuální `server.js` je starý prototyp s jednou tabulkou a číselným ID; **není implementací schváleného modelu**.
+Detail kontaktu umožní spravovat libovolný počet telefonů v subgridu. Implementace musí odpovídat schválenému datovému modelu; existující prototyp dosud není referenční implementací.
 
 ## REST API v1 — schválený kontrakt
 
@@ -99,7 +99,7 @@ Jediným závazným kontraktem je [API.md](docs/API.md). Obsahuje **pět CRUD op
 | Aktualizace | `PUT /api/contacts/{id}` | `PUT /api/telephones/{id}` |
 | Smazání | `DELETE /api/contacts/{id}` | `DELETE /api/telephones/{id}` |
 
-Pro subgrid: `GET /api/telephones?contactId={guid}`. Všechny identifikátory jsou GUID řetězce; `id` vytváří backend. Staré vnořené endpointy `/api/contacts/{contactId}/telephone-numbers` se **nepoužívají**. Backend Node.js je první implementace; ASP.NET Core a PHP mají později implementovat totožný kontrakt.
+Pro subgrid: `GET /api/telephones?contactId={guid}`. Všechny identifikátory jsou GUID řetězce; `id` vytváří backend. Backend Node.js je první implementace; ASP.NET Core a PHP mají později implementovat totožný kontrakt.
 
 ## Uživatelské rozhraní — cílová specifikace
 
@@ -191,78 +191,7 @@ Metadatové definice musí podporovat minimálně:
 6. **Option set** — stabilní hodnoty a zobrazované popisky (např. `mobile` → Mobil).
 7. **Dialogy a akce** — konfigurovatelné potvrzení mazání a vazba akcí na příslušné REST operace.
 
-Příklad **ilustrativního návrhu** metadat (finální JSON schéma rendereru se ještě musí schválit):
-
-```json
-{
-  "entities": {
-    "contact": {
-      "idField": "id",
-      "provider": {
-        "list": { "method": "GET", "url": "/api/contacts" },
-        "get": { "method": "GET", "url": "/api/contacts/{id}" },
-        "create": { "method": "POST", "url": "/api/contacts" },
-        "update": { "method": "PUT", "url": "/api/contacts/{id}" },
-        "delete": { "method": "DELETE", "url": "/api/contacts/{id}" }
-      },
-      "fields": {
-        "firstName": { "type": "text", "label": "Jméno", "required": true },
-        "lastName": { "type": "text", "label": "Příjmení", "required": true },
-        "address": { "type": "textarea", "label": "Adresa" },
-        "description": { "type": "textarea", "label": "Popis" }
-      },
-      "views": {
-        "main": { "type": "grid", "columns": ["firstName", "lastName"], "openForm": "detail", "allowCreate": true, "allowDelete": true }
-      },
-      "forms": {
-        "detail": {
-          "fields": ["firstName", "lastName", "address", "description"],
-          "subgrids": [{ "entity": "telephoneNumber", "relationField": "contactId", "parentIdField": "id", "view": "byContact" }],
-          "actions": ["save", "cancel"]
-        }
-      }
-    },
-    "telephoneNumber": {
-      "idField": "id",
-      "provider": {
-        "list": { "method": "GET", "url": "/api/telephones" },
-        "get": { "method": "GET", "url": "/api/telephones/{id}" },
-        "create": { "method": "POST", "url": "/api/telephones" },
-        "update": { "method": "PUT", "url": "/api/telephones/{id}" },
-        "delete": { "method": "DELETE", "url": "/api/telephones/{id}" }
-      },
-      "filter": { "contactId": "{parent.id}" },
-      "fields": {
-        "type": {
-          "type": "optionset",
-          "label": "Typ telefonu",
-          "required": true,
-          "options": [
-            { "value": "mobile", "label": "Mobil" },
-            { "value": "landline", "label": "Pevná linka" },
-            { "value": "fax", "label": "Fax" },
-            { "value": "work", "label": "Telefon do práce" },
-            { "value": "other", "label": "Jiný" }
-          ]
-        },
-        "phoneNumber": { "type": "text", "label": "Telefonní číslo", "required": true },
-        "description": { "type": "textarea", "label": "Popis" }
-      },
-      "views": {
-        "byContact": { "type": "grid", "columns": ["type", "phoneNumber", "description"], "openForm": "detail", "allowCreate": true, "allowDelete": true }
-      },
-      "forms": {
-        "detail": { "fields": ["type", "phoneNumber", "description"], "actions": ["save", "cancel"] }
-      }
-    }
-  },
-  "navigation": [{ "label": "Kontakty", "entity": "contact", "view": "main" }],
-  "dashboard": { "tiles": [{ "label": "Moje kontakty", "entity": "contact", "view": "main" }] },
-  "dialogs": { "confirmDelete": { "type": "modal", "buttons": ["yes", "no"] } }
-}
-```
-
-**Důležité:** Ukázka ilustruje aktuální pole a API, ale konkrétní schema, vazby, validace a chování univerzálního rendereru zatím **nejsou finálně uzavřeny**.
+**Finální schéma JSON metadat ještě nebylo schváleno.** Do schválení neexistuje závazná ukázka JSON struktury. Renderer musí respektovat výše uvedené funkční požadavky a kontrakty datového modelu a REST API. Konkrétní schéma, datové vazby, validace a chování rendereru jsou samostatným otevřeným návrhovým úkolem.
 
 ## Spuštění na Windows
 
@@ -295,7 +224,7 @@ Ukončením Node.js procesu (`Ctrl+C`) skončí také práce s SQLite; data zůs
 
 První fázi projektu vyvíjí **jeden univerzální AI agent**, bez multiagentní orchestrace a bez delegování na DB/Backend/Frontend/QA podagenty. Zadání lze diktovat ChatGPT, který může přímo upravovat dokumentaci a zdrojové soubory na GitHubu; později lze použít lokální Codex CLI se stejným repozitářem a pravidly v `AGENTS.md`.
 
-Historické instrukce v `agents/*.md` nejsou aktivní. Jeden agent řeší databázi, REST API, metadata-driven frontend i testování postupně. Závazné kontrakty jsou `docs/DATOVY_MODEL.md` a `docs/API.md`. Binární dokumentace se ukládá na Google Drive do `Context Demo/Dokumentace/Návrh`.
+Jeden agent řeší databázi, REST API, metadata-driven frontend i testování postupně. Závazné kontrakty jsou `docs/DATOVY_MODEL.md` a `docs/API.md`. Binární dokumentace se ukládá na Google Drive do `Context Demo/Dokumentace/Návrh`.
 
 ## Dokumentace, historie a vizuální návrh
 
@@ -309,4 +238,4 @@ Historické instrukce v `agents/*.md` nejsou aktivní. Jeden agent řeší datab
 
 ## Bezpečnost a stav
 
-Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je ve fázi finalizace zadání; jednoagentní vývoj podle nových kontraktů zatím nebyl proveden. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
+Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je ve fázi dokončování specifikace JSON metadat; nová implementace podle schválených kontraktů zatím nebyla ověřena. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
