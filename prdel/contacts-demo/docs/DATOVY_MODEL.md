@@ -72,7 +72,7 @@ erDiagram
 
 1. Primární klíče obou entit jsou **GUID/UUID**, nikoliv číselné auto-increment identifikátory.
 2. Pro interoperabilitu používat UUID ve standardním textovém formátu `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, malá písmena, bez složených závorek; generovat nové identifikátory jako **UUID v4**. SQLite je ukládá jako `TEXT`, v API jsou to řetězce; při případné portaci do Dataverse lze mapovat na GUID.
-3. Nové `Id` přiděluje backend při vytvoření záznamu. `ContactId` telefonu se odvozuje z nadřazeného kontaktu / URL API a není volně editovatelný.
+3. Nové `Id` přiděluje backend při vytvoření záznamu. `ContactId` telefonu se při vytvoření předává v JSON těle požadavku `POST /api/telephones` (podle aktuálního [API kontraktu](API.md)); v UI se automaticky vyplní z otevřeného kontaktu. Po vytvoření není volně editovatelný.
 4. `TelephoneNumbers.ContactId` je povinný cizí klíč na `Contacts.Id`, s indexem pro rychlé načtení subgridu.
 5. Při smazání kontaktu se odstraní jeho telefony: `ON DELETE CASCADE`. V SQLite zapnout `PRAGMA foreign_keys = ON` pro každé databázové připojení.
 6. Jeden kontakt může mít více telefonů stejného typu; duplicity čísel nejsou na databázové úrovni zakázány.
