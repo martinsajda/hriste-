@@ -302,6 +302,7 @@ Historické instrukce v `agents/*.md` nejsou aktivní. Jeden agent řeší datab
 - [Datový model](docs/DATOVY_MODEL.md) — závazný popis entit, GUID a vztahů.
 - [REST API](docs/API.md) — závazný popis všech 10 CRUD operací.
 - [Architektura](docs/ARCHITECTURE.md) — technologické vrstvy, lokální provoz a plánované portace.
+- [DEPLOY.md](DEPLOY.md) — budoucí automatizované nahrávání na PHP webhosting přes FTP/FTPS/SFTP.
 - [AGENTS.md](AGENTS.md) — instrukce pro jediného vývojového agenta.
 - [HISTORIE.md](HISTORIE.md) — průběžný záznam konverzace, nikoliv specifikace; starší úseky mohou být neúplné.
 - [Vizuální návrh na Google Drive](https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view) — uložený v `Context Demo/Dokumentace/Návrh`. Název složky Drive se liší od názvu aplikace `Contacts Demo`; jde o aktuální existující umístění.
