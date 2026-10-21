@@ -276,24 +276,36 @@
     },
     "selection": {
       "type": "object",
+      "description": "Rezim vyberu radku: none = zadny vyber, single = maximalne jeden radek, multiple = vice radku.",
       "additionalProperties": false,
+      "required": ["mode"],
       "properties": {
         "mode": {
-          "enum": [
-            "none",
-            "single",
-            "multiple"
-          ]
+          "enum": ["none", "single", "multiple"],
+          "description": "none zakazuje vyber; single dovoluje 0 nebo 1 vybrany radek; multiple dovoluje 0 az N radku."
         },
         "showCheckboxes": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Zobrazeni ovladacich prvku vyberu. Pri none musi byt false; pri single se zobrazi jeden ovladac na radek, bez vyberu vsech."
         },
         "selectAllScope": {
-          "enum": [
-            "currentPage"
-          ]
+          "enum": ["currentPage"],
+          "description": "Pouze pro multiple; hromadny vyber jen na aktualni strance."
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"mode": {"const": "none"}}, "required": ["mode"]},
+          "then": {
+            "properties": {"showCheckboxes": {"const": false}},
+            "not": {"required": ["selectAllScope"]}
+          }
+        },
+        {
+          "if": {"properties": {"mode": {"const": "single"}}, "required": ["mode"]},
+          "then": {"not": {"required": ["selectAllScope"]}}
+        }
+      ]
     },
     "recordOpening": {
       "type": "object",
