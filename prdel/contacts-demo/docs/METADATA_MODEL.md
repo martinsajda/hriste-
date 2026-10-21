@@ -9,7 +9,7 @@
 1. Převzít **sémantiku a typový systém Microsoft SDK 1:1** jako cílový doménový model. Žádné vlastní zjednodušené substituty typů `EntityReference`, `Money`, `OptionSetValue`, `AliasedValue` apod.
 2. **Nezaměňovat** objektový model SDK, Dataverse OData Web API a naši JSON serializaci. SDK je sémantický zdroj pravdy; konkrétní JSON wire formát je náš dokumentovaný, verzovaný kontrakt. Názvy vlastností JSON jsou camelCase, logical names lowercase, identifikátory case-sensitive.
 3. **Metadata oddělit od dat**: entity/attribute/relationship/option-set metadata se načítají a cachují nezávisle; entity records obsahují pouze hodnoty, identitu a případné formatted values. Grid/form layout metadata jsou další samostatná vrstva.
-4. Frontend a renderery neznají backend: `mock/json`, `sqlite`, `dataverse` a později jiné providery musí produkovat shodné kontrakty.
+4. Frontend a renderery neznají fyzický backend: `mock/json`, `sqlite`, `dataverse` a jiné implementace musejí zachovat shodnou sémantiku typovaných dat a metadat. **Neznamená to povinné shodné URL, CRUD endpointy nebo veřejné servisní rozhraní provideru.**
 5. Převod **nesmí ztratit** typ, lookup target, alias origin, peněžní přesnost, null/absent rozdíl, paging cookie, total count ani lokalizované labely, jsou-li dostupné.
 6. Rozsah SDK je referenční, ale implementace může být inkrementální; nepodporovaný typ musí být explicitně odmítnut či označen, nikoli tiše převeden na string.
 
@@ -146,18 +146,19 @@ Příklad demonstruje **tvar cílového kontraktu**, nikoli kompletní export v�
 
 **Oddělené dokumenty:** `entity metadata` popisují atributy, typy, lookup targets, option sets, vztahy a validace; `entity data` obsahují instance a hodnoty; `grid/form metadata` popisují rozvržení a interakce. UI renderer si typ sloupce odvozuje primárně z metadat entity, ne z náhodné hodnoty v prvním záznamu.
 
-## 5. Dataverse / FetchXML adapter
+## 5. Dataverse / FetchXML adapter (pouze příklad interní implementace)
 
 ```text
 Grid / Form / Lookup renderery
-       ↓ jednotný JSON model-driven kontrakt
-MetadataProvider + DataProvider
-       ├─ Demo JSON / SQLite adapter
-       └─ Dataverse adapter
-            ├─ RetrieveEntity / RetrieveMetadataChanges (metadata)
-            └─ FetchXML / RetrieveMultiple (EntityCollection, Entity)
+       ↓ konkrétní aplikační REST kontrakt; typovaná data a metadata
+Aplikační REST API / backend
+       ├─ interní implementace JSON / SQLite / SQL
+       ├─ interní implementace Dataverse
+       │    ├─ RetrieveEntity / RetrieveMetadataChanges (metadata)
+       │    └─ FetchXML / RetrieveMultiple (EntityCollection, Entity)
+       └─ případné složení dat z více nezávislých systémů
                          ↓
-                  SDK → typově věrný JSON serializer
+               typově věrná JSON reprezentace
 ```
 
 - Adapter převádí `EntityCollection` včetně `MoreRecords`, `PagingCookie`, `TotalRecordCount` a `Entities`.
@@ -168,6 +169,8 @@ MetadataProvider + DataProvider
 - Peněžní a desetinné hodnoty se mapují bezztrátově; DateTime behavior (UserLocal / DateOnly / TimeZoneIndependent) se určuje podle metadat, nikoli heuristikou.
 - Metadata mohou být cachována a verzována nezávisle na záznamech; invalidace je explicitní.
 - Server řeší autorizaci a skutečné oprávnění ke čtení/zápisu; klientská metadata nejsou bezpečnostní hranice.
+
+**Normativní hranice:** Tento diagram nevymezuje povinné třídy ani veřejné metody `MetadataProvider` / `DataProvider`. Jde pouze o příklady backendových implementací. Dataverse `Retrieve`, `RetrieveMultiple`, `Create`, `Update` a `Delete` jsou interní operace zdroje, **nikoli metody předepsané REST API nebo model-driven frameworkem**. REST kontrakty jsou konkrétní pro entity a aplikační scénáře. Formulář může mít deklarativně určenou HTTP operaci a mapování dat, aniž by tím vzniklo generické CRUD API. Logická entita může být složena z více zdrojů. Závazné rozhodnutí je v [ARCHITECTURE.md](ARCHITECTURE.md), ADR „Oddělení model-driven datového modelu od servisních operací“.
 
 ## 6. Kompatibilita se stávajícím Contacts Demo
 
