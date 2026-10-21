@@ -262,3 +262,27 @@ Tento soubor je **chronologický záznam dialogu**, nikoli syntéza zadání. Sy
 ## Pokračování
 
 Při dalších změnách projektu se na konec souboru připojují další **uživatelské a asistentské repliky v pořadí**, pokud je jejich přesné znění dostupné. Není-li dostupné, musí to být výslovně uvedeno; nikdy nevytvářet smyšlený doslovný přepis.
+
+## 2026-10-21 — schválení case-sensitive konvencí metadat
+
+**Uživatel (doslovně):**
+
+> Souhlasím, case sensitive, ten camel case a tak podobně, jak si popisoval výše. Zapiš tohleto všechno do pravidel architektury.
+
+**Asistent (věcný záznam, nikoli doslovný přepis):**
+
+> Dohodnuto: JSON klíče a technické identifikátory jsou case-sensitive. Vlastnosti metamodelu a API používají camelCase; logické názvy entit, atributů, relací a OptionSetů lowercase. Validátor kontroluje konvenci a kolize; existující fyzické SQL a API názvy se nemění a mapují se explicitně. První dva pokusy o zápis dokumentace konektor zablokoval bezpečnostní kontrolou.
+
+**Uživatel (doslovně):**
+
+> Co bylo zase zablokováno? Odkazy z README.md na jiné MD soubory?
+
+**Asistent (věcný záznam):**
+
+> Nešlo o odkazy v README. Zablokována byla operace zápisu do `docs/ARCHITECTURE.md`; příčina blokace nebyla známa.
+
+**Uživatel (doslovně):**
+
+> Tak zkusme to ještě jednou.
+
+**Výsledek:** Opakovaný zápis pravidel do `docs/ARCHITECTURE.md` tentokrát uspěl. Commit `9083ccc7ebb3bcbebac6ab84d1fbd5c814f5f70d` na výchozí větvi.
