@@ -1,45 +1,60 @@
-# Data Definition — návrh datového kontraktu inspirovaného D365 SDK
+# Data Definition — model-driven datová architektura
 
-**Stav: pracovní návrh k diskusi (21. 10. 2026), nikoli schválený REST kontrakt.** Odděleno od metadat gridu v `docs/GRID_METADATA.md`. Nic se zatím neimplementuje.
+**Schválený princip (21. 10. 2026):** metadata datového modelu a entit jsou oddělena od runtime dat. Formuláře i gridy čtou tentýž katalog metadat. Příklady a JSON Schema v této složce jsou **pracovní kontrakt v1 k další revizi**, nikoli hotové nebo automaticky schválené REST API.
 
-## Cíl
+## Tři oddělené vrstvy
 
-Podobně jako Microsoft Dynamics 365 SDK rozlišit:
-1. **EntityCollection** — sadu vrácených záznamů a stránkovací informace.
-2. **Entity** — jeden záznam: logický název entity, GUID záznamu a kolekci typovaných atributů.
-3. **AttributeValue** — hodnotu atributu, včetně speciálních typů `OptionSetValue` a `EntityReference` (lookup).
-4. **EntityMetadata / AttributeMetadata** — popis entity a atributů, včetně lokalizovaných popisků podle LCID. **Metadata nejsou totéž co data záznamu.**
+1. **Data Model / Entity Metadata** — logické názvy entit, atributy, typy, primární klíče, vztahy, lookup targets, option set hodnoty, validace, lokalizované popisky dle LCID.
+2. **Presentation Metadata** — samostatná metadata gridu a v budoucnu formuláře: layout, pořadí, viditelnost, ovládací prvky, akce a události. Nepředefinují základní datový typ atributu.
+3. **Entity Data** — konkrétní Entity / EntityCollection: identita záznamu a nativní hodnoty atributů, bez opakování typu u každého pole.
 
-Pozor na rozdíl: lookup `EntityReference.id` je **GUID cílového záznamu**, nikoli GUID definice typu entity. `logicalName` identifikuje cílovou entitu; případný stabilní identifikátor definice entity je samostatná otázka.
+**Renderer** zkombinuje entity metadata + metadata formuláře/gridu + data a podle typu atributu automaticky zvolí ovládací prvek a doplní hodnotu. **Backend** je autoritou pro integritu, oprávnění a validaci.
 
-## Navrhovaná struktura složky
+## Schválené rozhodnutí o reprezentaci hodnot
 
-- `README.md` — principy, rozhodnutí a otevřené otázky.
-- `ENTITY_CONTRACT.md` — návrh struktury EntityCollection, Entity, typů atributů, lokalizace a lookupů.
-- `examples/` — až po odsouhlasení kontraktu doplníme strojově čitelné ukázky.
-- `schemas/` — až po odsouhlasení kontraktu JSON Schema pro entity a kolekce.
+Běžné atributy mají **nativní JSON hodnoty**: string, integer/number, boolean, ISO datum jako string, GUID jako string, null. **Nepoužívat obálky `{"type":"...","value":...}` u každého atributu.** Typ se určí z EntityMetadata. Speciální `lookup` nese objekt `EntityReference` s `logicalName`, `id` GUID cílového záznamu a volitelným `name`. Option set ukládá invariantní kód; jeho lokalizovaný popisek je v metadatech. Decimal s požadavkem na přesnost, date/time behavior a integer vs string option set jsou stále otevřené detaily.
 
-## Hranice odpovědnosti
+## Vazba na D365 SDK
 
-REST API vrací **hotovou výslednou sadu**. Může obsahovat hodnoty z navázaných entit, aliasované atributy a lookup reference; jak backend vztahy získal (SQL JOIN, FetchXML, jiný provider), frontend neřeší. Grid později zpracuje data podle tohoto kontraktu a svých zobrazovacích metadat.
+- `EntityCollection` obsahuje `entities` a `paging`.
+- `Entity` obsahuje `logicalName`, `id` a `attributes`.
+- `EntityMetadata` / `AttributeMetadata` jsou oddělené definice.
+- `EntityReference` je lookup na **záznam** jiné entity, nikoli GUID typu entity.
+- Hodnoty z dalších entit může do výsledné sady sestavit REST API; grid žádné JOINy neprovádí.
 
-**Kompatibilita:** existující `docs/API.md` nyní vrací jednoduché JSON objekty a pole; návrh EntityCollection je potenciální **nová reprezentace**, nikoli již schválená náhrada. O způsobu migrace, případně samostatném SDK-like endpointu, rozhodneme před změnou API.
+## Soubory
 
-**Lokalizace:** centrální `app.config.json` stanoví `defaultLcid=1029` a podporované LCID 1029/1033/1031. Metadata mají lokalizované názvy entity, atributů a možností. Data vracejí invariantní hodnoty; lokalizované popisky se zjišťují podle metadat a LCID. Případný předformátovaný display text je jen pomocná hodnota, nikoli zdroj pravdy.
+| Soubor | Účel |
+| --- | --- |
+| [ENTITY_CONTRACT.md](ENTITY_CONTRACT.md) | Podrobný návrh, příklady, otevřené otázky |
+| [examples/model.metadata.json](examples/model.metadata.json) | Katalog entit, vztah 1:N, sdílený option set |
+| [examples/contact.entity-metadata.json](examples/contact.entity-metadata.json) | Metadata kontaktu, LCID názvy a atributy |
+| [examples/telephone.entity-metadata.json](examples/telephone.entity-metadata.json) | Metadata telefonu, lookup na kontakt a option set |
+| [examples/contacts.entity-collection.json](examples/contacts.entity-collection.json) | Runtime data kontaktů |
+| [examples/telephones.entity-collection.json](examples/telephones.entity-collection.json) | Runtime data telefonů a lookup |
+| [schemas/model-metadata.schema.json](schemas/model-metadata.schema.json) | JSON Schema katalogu |
+| [schemas/entity-metadata.schema.json](schemas/entity-metadata.schema.json) | JSON Schema definice entity |
+| [schemas/entity-collection.schema.json](schemas/entity-collection.schema.json) | JSON Schema návratové kolekce |
 
-## Otevřená rozhodnutí
+Ke každému `examples/*.json` existuje stejně pojmenovaný **`.jsonc`** s komentáři pro vývojáře. JSONC je pouze dokumentační varianta, **není** vstupem standardního `JSON.parse`. Schémata jsou Draft 2020-12; kontrolují tvar, nikoli sémantiku mezi soubory.
 
-- [ ] DDATA-01: Typované obálky hodnot vs nativní JSON typy + metadata atributů (velikost payloadu a ergonomie JS).
-- [ ] DDATA-02: Oddělený katalog EntityMetadata vs vložení definic do každé odpovědi; načítání, cache, verze.
-- [ ] DDATA-03: `logicalName`, `id`, `primaryNameAttribute`, `displayName`, případně `entityTypeId` (GUID definice entity).
-- [ ] DDATA-04: `EntityReference`: `logicalName`, `id`, `name`, polymorfní lookup, null, navigace.
-- [ ] DDATA-05: `OptionSetValue`: stabilní integer jako v D365 vs stávající string enum u telefonu; migrace.
-- [ ] DDATA-06: DateTime UTC / date-only / timezone behavior a desetinná čísla bez ztráty přesnosti.
-- [ ] DDATA-07: Hodnoty ze souvisejících entit: aliasované atributy, zdrojový logicalName, cesta vztahu, duplicitní názvy.
-- [ ] DDATA-08: Kolekce: `totalRecordCount`, `moreRecords`, stránkování, server sort/filter, kompatibilita s API v1.
-- [ ] DDATA-09: Prázdný atribut vs explicitní null, chybějící atribut, readonly, validace a oprávnění.
-- [ ] DDATA-10: Metadata LCID a fallback; lokalizace názvů entity/atributů/option setů.
-- [ ] DDATA-11: Typy money, bigint, multi-select options, owner/customer lookup, state/status, file/image v dalších verzích.
-- [ ] DDATA-12: Datový kontrakt pro create/update vs read (SDK-like odpověď nemusí být vhodné POST body).
+## Lokalizace
 
-Další detailní příklady a návrhy jsou v [ENTITY_CONTRACT.md](ENTITY_CONTRACT.md).
+`app.config.json` určuje `defaultLcid: 1029` a `supportedLcids: [1029,1033,1031]`. Definice entit, atributů a option setů nesou mapy LCID popisků. Renderer při chybějícím překladu použije defaultLcid. Runtime hodnoty jsou jazykově invariantní.
+
+## Vztah ke stávajícímu API a databázi
+
+Stávající [docs/DATOVY_MODEL.md](../docs/DATOVY_MODEL.md) a [docs/API.md](../docs/API.md) zůstávají **platné pro původní jednoduchý CRUD v1**. Nová SDK-like `EntityCollection` se zatím nevrací ze stávajících endpointů; nejde o tichou změnu API. Stávající `contactId` je prostý GUID string, zatímco nová SDK-like reprezentace používá `EntityReference` — způsob mapování se musí rozhodnout.
+
+## Otevřené body před programováním
+
+- [ ] DD01 Jak mapovat jednoduché CRUD API v1 na EntityCollection (samostatný endpoint, adaptér, nebo nová verze API).
+- [ ] DD02 Definovat typy: decimal přesnost, integer rozsahy, date-only vs dateTime UTC/timezone.
+- [ ] DD03 Option set: ponechat string kódy u telefonu nebo migrovat na integer podobně jako D365.
+- [ ] DD04 Lookup: povinná `name`? polymorfní reference? null? lookup v POST/PUT?
+- [ ] DD05 Aliased values z dalších entit, jejich identita, metadata zdroje a navigace.
+- [ ] DD06 Rozlišit explicitní null, nevrácený atribut, readonly a přístupová práva.
+- [ ] DD07 Metadata katalog: verzování, cache, invalidace, načítání přes HTTP fetch.
+- [ ] DD08 Přesná definice primaryNameAttribute (u kontaktu může být složené jméno).
+- [ ] DD09 Přísná sémantická validace typů hodnot proti EntityMetadata; JSON Schema samo nestačí.
+- [ ] DD10 Navrhnout metadata formuláře až následně, odděleně od datového kontraktu.
