@@ -2,7 +2,7 @@
 
 ## Cíl projektu
 
-Cílem projektu je vytvořit jednoduchou lokální webovou aplikaci pro evidenci kontaktů, která bude fungovat na Windows bez cloudové infrastruktury a bez nutnosti instalovat samostatný databázový server.
+Cílem projektu je vytvořit jednoduchou lokální webovou aplikaci pro evidenci kontaktů, která bude v první fázi fungovat lokálně na Windows i macOS bez cloudové infrastruktury a bez nutnosti instalovat samostatný databázový server.
 
 Aplikace bude postavena na třech vrstvách:
 
@@ -26,7 +26,7 @@ Lokální Node.js server (127.0.0.1:3000)
 SQLite (data/contacts.db)
 ```
 
-Aplikace bude běžet výhradně lokálně. Backend bude obsluhovat jak REST API, tak statické soubory frontendu, takže není nutný samostatný webový server ani frontendový bundler.
+V první fázi aplikace poběží výhradně lokálně. Node.js backend bude obsluhovat jak REST API, tak statické soubory frontendu, takže není nutný samostatný webový server ani frontendový bundler.
 
 ### Graf architektury
 
@@ -53,6 +53,28 @@ flowchart TB
     DB -.-> T
     C -->|"1 : N (ContactId)"| T
 ```
+
+### Přenositelnost a varianty nasazení backendu
+
+**Závazný princip:** frontend (statické HTML, univerzální JavaScript renderer, JSON metadata, centrální CSS) komunikuje výhradně přes stabilní REST API v1. Nesmí záviset na jazyce nebo technologii, ve které je backend implementován. Backend lze vyměnit bez změn definic formulářů a gridů.
+
+| Cílové prostředí | Implementace REST backendu | Databáze | Stav |
+| --- | --- | --- | --- |
+| Lokální Windows a macOS | Node.js | SQLite | První implementace |
+| Windows Server / IIS | ASP.NET Core v C# | SQLite | Budoucí portace |
+| Apache / běžný PHP webhosting | PHP | SQLite | Budoucí portace |
+
+**Prozatím používáme SQLite ve všech variantách.** Podpora SQL Server Express a MariaDB není součástí aktuálního rozsahu; případné další databázové providery se navrhnou až později. Oddělení databázové vrstvy od HTTP controllerů má budoucí rozšíření usnadnit, ale samo o sobě neznamená, že bude bez práce.
+
+Pravidla přenositelnosti:
+
+- Všechny backendy implementují stejná REST URL, HTTP metody, JSON názvy polí, option sety, validace, návratové kódy a chybové odpovědi. Kontrakt REST API v1 je nezávislý na implementaci.
+- Backend má oddělenou HTTP/API vrstvu, aplikační logiku a SQLite repository/provider vrstvu. Při portaci z Node.js do C# nebo PHP se backendová implementace přepíše v příslušném jazyce, frontend se zachová.
+- Base URL API je konfigurovatelná; metadata neobsahují pevně zadaný host nebo port. Výchozí relativní prefix je `/api`.
+- Databázové schéma SQLite, datové typy a migrace budou verzované a společné pro všechny implementace; je nutné zohlednit rozdíly v přístupových knihovnách.
+- Nasazení na IIS a Apache není automaticky spuštění původního Node.js procesu: na IIS se počítá s ASP.NET Core, na PHP hostingu s PHP.
+- U webhostingu je potřeba předem ověřit dostupnost SQLite rozšíření (PHP PDO SQLite), zapisovatelný prostor pro databázi a omezení hostingu. Soubor SQLite musí být **mimo veřejně dostupný webový adresář** a chráněný před stažením přes HTTP.
+- Veřejné nasazení bude vyžadovat doplnění autentizace, autorizace, HTTPS a provozních bezpečnostních opatření; současná lokální demonstrace je nemá.
 
 ## Rozsah demonstrační aplikace
 
