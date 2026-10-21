@@ -243,6 +243,20 @@ Tento soubor je **chronologický záznam dialogu**, nikoli syntéza zadání. Sy
 **Poznámka archivace:** Text asistenta zde obsahuje věcný přepis průběžné odpovědi bez tabulkového rozvržení a UI komponent; nejde o úplný doslovný přepis.
 
 
+
+## 2026-10-21 — plán nasazení na PHP hosting
+
+**Uživatel:**
+
+> Zavoštám ještě soubor deploy.md a tam si popíšeme způsob, jakým to bude potom vystavíme na internetu. Tak tam pro začátek zapiš, že uděláme potom automatické nahrávání přes FTP server do mého webhostingu s PHP, tam potom dáme PHP verzi té backend části. Ano.
+
+**Asistent (zapsané rozhodnutí):**
+
+> Založen `DEPLOY.md` s plánem automatického nahrávání frontendu a budoucí PHP implementace REST backendu na webhosting přes FTP; doporučené zabezpečené varianty FTPS/SFTP. Jde o plán, bez konfigurace nasazení a bez připojení k hostingu.
+
+**Poznámka archivace:** Odpověď asistenta je zde zkrácena; není vydávána za doslovný přepis.
+
+
 ---
 
 ## Pokračování
