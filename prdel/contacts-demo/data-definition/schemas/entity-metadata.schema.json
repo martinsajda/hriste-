@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EntityMetadata v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "logicalName",
+    "primaryIdAttribute",
+    "displayNames",
+    "attributes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "logicalName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "collectionName": {
+      "type": "string"
+    },
+    "primaryIdAttribute": {
+      "type": "string"
+    },
+    "primaryNameAttribute": {
+      "type": "string"
+    },
+    "displayNames": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[0-9]+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1
+    },
+    "displayCollectionNames": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[0-9]+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1
+    },
+    "attributes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "logicalName",
+          "type",
+          "labels"
+        ],
+        "properties": {
+          "logicalName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "enum": [
+              "string",
+              "integer",
+              "decimal",
+              "dateTime",
+              "guid",
+              "boolean",
+              "optionSet",
+              "lookup"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "primaryId": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "labels": {
+            "type": "object",
+            "propertyNames": {
+              "pattern": "^[0-9]+$"
+            },
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minProperties": 1
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "optionSet": {
+            "type": "string"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "lookup"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "targets"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "optionSet"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "optionSet"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
