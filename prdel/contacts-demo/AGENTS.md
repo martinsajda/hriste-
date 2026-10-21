@@ -8,10 +8,10 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 
 ## Zdroje pravdy a pořadí čtení
 
-1. `README.md` — účel aplikace, UI a celkové zadání.
+1. `README.md` — účel aplikace, UI a celkové zadání (schválené kontrakty mají přednost před ilustrativními ukázkami).
 2. `docs/DATOVY_MODEL.md` — závazné schéma dvou entit, GUID a vztah 1:N.
 3. `docs/API.md` — závazný REST API v1 kontrakt: 5 CRUD operací na entitu, celkem 10.
-4. `docs/ARCHITECTURE.md` — pomocný dokument; v případě rozporu s výše uvedenými dokumenty má nižší prioritu.
+4. `docs/ARCHITECTURE.md` — aktuální popis technologických vrstev a provozu.\n5. `HISTORIE.md` — archiv dialogu, **není** závaznou technickou specifikací.
 
 **Staré soubory `agents/01-database.md` až `agents/04-qa.md` jsou historické a nejsou aktivní instrukce. Nevyvolávej podle nich žádné agenty a neřiď se jejich zastaralými kontrakty.**
 
@@ -38,6 +38,13 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 - GitHub: zdrojové kódy, Markdown, JSON metadata a textové specifikace.
 - Google Drive: binární dokumentace projektu ve složce `Context Demo/Dokumentace/Návrh` a případných dalších podsložkách.
 - Schválený vizuální návrh: https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view
+
+## Průběžný záznam konverzace
+
+- Při aktivní práci na projektu udržuj `HISTORIE.md` jako chronologický záznam dostupných replik uživatele a asistenta. Zapisuj průběžně při úpravách repozitáře.
+- Zachovávej přesné formulace, pokud jsou dostupné; nikdy neoznačuj zkrácení nebo rekonstrukci za doslovný přepis. Pokud část dialogu chybí, výslovně to uveď.
+- `README.md`, `docs/API.md` a další specifikace jsou syntézou rozhodnutí a zůstávají oddělené od historie.
+- Žádné automatické zapisování na pozadí mimo aktivní práci nebo bez dostupného připojení není zajištěno.
 
 ## Aktuální fáze
 
