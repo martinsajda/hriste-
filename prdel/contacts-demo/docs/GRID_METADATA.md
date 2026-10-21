@@ -5,7 +5,7 @@
 ## Principy
 
 - Jeden univerzální grid, dvě strategie načítání dat: `pagination.mode = "client"` a `"server"`.
-- JSON definuje datový zdroj, sloupce, nadpisy, výchozí vícesloupcové řazení, stránkování, výběr řádků a filtrování jednotlivých sloupců operátorem `contains`.
+- JSON definuje datový zdroj, sloupce, nadpisy, výchozí vícesloupcové řazení, stránkování, výběr řádků, viditelnost a šířky sloupců, otevírání záznamů a filtrování jednotlivých sloupců operátorem `contains`.
 - Vzhled je řízen centrálním CSS; metadata neobsahují inline styly.
 - Klientský režim načte celé pole a řadí, filtruje a stránkuje lokálně.
 - Serverový režim při změně stránky, velikosti stránky či řazení opakuje GET požadavek. Server provádí řazení, filtrování a stránkování nad celým datasetem **před** odesláním stránky.
@@ -27,10 +27,10 @@
     "response": { "idField": "id" }
   },
   "columns": [
-    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true },
-    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true },
-    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true },
-    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true }
+    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 160, "minWidth": 100 },
+    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 190, "minWidth": 100 },
+    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 240, "minWidth": 100 },
+    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true, "visible": false, "width": 300, "minWidth": 100 }
   ],
   "sorting": {
     "enabled": true,
@@ -46,9 +46,31 @@
     "pageSizeOptions": [10, 20, 50, 100],
     "showTotalCount": true
   },
-  "filtering": {\n    "enabled": true,\n    "display": "columnHeader",\n    "defaultOperator": "contains",\n    "caseSensitive": false,\n    "combine": "and"\n  },\n  "selection": { "mode": "multiple", "showCheckboxes": true }
+  "filtering": {
+    "enabled": true,
+    "display": "columnHeader",
+    "defaultOperator": "contains",
+    "caseSensitive": false,
+    "combine": "and"
+  },
+  "selection": { "mode": "multiple", "showCheckboxes": true },
+  "recordOpening": {
+    "enabled": true,
+    "trigger": "column",
+    "field": "lastName",
+    "target": { "type": "form", "entity": "contact", "form": "detail" }
+  }
 }
 ```
+
+## Viditelnost, šířky a otevření záznamu
+
+- `columns[].visible` určuje počáteční viditelnost sloupce. `false` sloupec skryje, ale nemaže datové pole ani jeho hodnotu z REST odpovědi. Výchozí hodnota při vynechání je `true`.
+- `columns[].width` je kladné číslo udávající preferovanou šířku v CSS pixelech nebo řetězec `"auto"`. `minWidth` a volitelné `maxWidth` jsou kladná čísla v CSS pixelech. Výchozí `width` je `"auto"`. Při `minWidth > maxWidth` jsou metadata neplatná. Rozměry jsou strukturální metadata; vlastní vykreslení, přetečení a responzivita zůstávají v centrálním CSS.
+- `recordOpening.enabled` povoluje otevření detailu. `trigger` může být `"column"` nebo `"row"`. U `"column"` je povinné `field`, které musí odpovídat viditelnému sloupci; pouze jeho hodnota se chová jako odkaz. U `"row"` se kliknutím na běžnou část řádku otevře záznam a `field` se neuvádí.
+- `recordOpening.target` odkazuje na definici formuláře pomocí `type: "form"`, `entity` a `form`; žádná URL formuláře není natvrdo zakódovaná. ID záznamu se přenese podle `dataSource.response.idField`.
+- Kliknutí na checkbox, tlačítko akce nebo ovládací prvek filtru nesmí spustit otevření záznamu ani při `trigger: "row"`. Otevření musí být dostupné i z klávesnice.
+- Pro referenční grid kontaktů je otevření nastaveno na sloupec `lastName`, formulář `contact/detail`; sloupec `description` je výchozím nastavením skrytý.
 
 ## Serverový režim — náhrada sekce pagination
 
@@ -64,7 +86,8 @@ Ostatní části gridu zůstávají stejné.
   "request": {
     "pageParam": "page",
     "pageSizeParam": "pageSize",
-    "sortParam": "sort",\n    "filterParamPrefix": "filter"
+    "sortParam": "sort",
+    "filterParamPrefix": "filter"
   },
   "response": {
     "itemsPath": "items",
@@ -136,4 +159,4 @@ Ukázka ilustruje tvar odpovědi, nikoli úplný počet položek na druhé strá
 
 ## Otevřené pro další iteraci
 
-Rozměry a viditelnost sloupců, formátování hodnot, otevírání záznamů, akce a detailní chování výběru řádků. Neimplementovat renderer, dokud nebude schválen související metadatový kontrakt.
+Formátování hodnot, další akce a detailní chování výběru řádků. Neimplementovat renderer, dokud nebude schválen související metadatový kontrakt.
