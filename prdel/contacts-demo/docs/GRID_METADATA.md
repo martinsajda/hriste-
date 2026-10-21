@@ -27,10 +27,10 @@
     "response": { "idField": "id" }
   },
   "columns": [
-    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 160, "minWidth": 100 },
-    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 190, "minWidth": 100 },
-    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 240, "minWidth": 100 },
-    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true, "visible": false, "width": 300, "minWidth": 100 }
+    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 160, "minWidth": 100, "resizable": true },
+    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 190, "minWidth": 100, "resizable": true },
+    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 240, "minWidth": 100, "resizable": true },
+    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true, "visible": false, "width": 300, "minWidth": 100, "resizable": true }
   ],
   "sorting": {
     "enabled": true,
@@ -66,6 +66,7 @@
 ## Viditelnost, šířky a otevření záznamu
 
 - `columns[].visible` určuje počáteční viditelnost sloupce. `false` sloupec skryje, ale nemaže datové pole ani jeho hodnotu z REST odpovědi. Výchozí hodnota při vynechání je `true`.
+- `columns[].resizable` je boolean určující, zda může uživatel měnit šířku sloupce tažením jeho hranice v záhlaví. Výchozí hodnota při vynechání je `false`. Při změně šířky se respektují `minWidth` a `maxWidth`; změna je pouze v aktuálním zobrazení gridu a nemění JSON definici. Trvalé ukládání uživatelských šířek zatím není součástí kontraktu.
 - `columns[].width` je kladné číslo udávající preferovanou šířku v CSS pixelech nebo řetězec `"auto"`. `minWidth` a volitelné `maxWidth` jsou kladná čísla v CSS pixelech. Výchozí `width` je `"auto"`. Při `minWidth > maxWidth` jsou metadata neplatná. Rozměry jsou strukturální metadata; vlastní vykreslení, přetečení a responzivita zůstávají v centrálním CSS.
 - `recordOpening.enabled` povoluje otevření detailu. `trigger` může být `"column"` nebo `"row"`. U `"column"` je povinné `field`, které musí odpovídat viditelnému sloupci; pouze jeho hodnota se chová jako odkaz. U `"row"` se kliknutím na běžnou část řádku otevře záznam a `field` se neuvádí.
 - `recordOpening.target` odkazuje na definici formuláře pomocí `type: "form"`, `entity` a `form`; žádná URL formuláře není natvrdo zakódovaná. ID záznamu se přenese podle `dataSource.response.idField`.
