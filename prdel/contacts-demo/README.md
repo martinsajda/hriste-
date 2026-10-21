@@ -30,12 +30,42 @@ Aplikace bude běžet výhradně lokálně. Backend bude obsluhovat jak REST API
 
 ## Rozsah demonstrační aplikace
 
-Jednoduchá evidence jména, příjmení a telefonu. Seznam kontaktů, přidání kontaktu a smazání s potvrzením.
+Cílový datový model bude obsahovat dvě tabulky:
 
-REST API:
+- **Contacts** — evidence kontaktů (např. jméno a příjmení).
+- **TelephoneNumbers** — telefonní čísla přiřazená ke kontaktům.
+
+Mezi tabulkami bude vztah **1:N**: jeden kontakt může mít více telefonních čísel; každé telefonní číslo náleží právě jednomu kontaktu. Vazba bude realizována cizím klíčem `TelephoneNumbers.ContactId` na `Contacts.Id`.
+
+Každý záznam `TelephoneNumbers` bude obsahovat:
+- `Id` — primární klíč,
+- `ContactId` — cizí klíč na kontakt,
+- `Type` — **option set** (výběr z předdefinovaných typů telefonu): **mobil, pevná linka, fax, pracovní, jiný**,
+- `PhoneNumber` — textové pole pro zadání telefonního čísla (aby se zachovalo `+`, úvodní nuly a formátování).
+
+```text
+Contacts (1)
+  Id
+  FirstName
+  LastName
+    │
+    └── (N) TelephoneNumbers
+              Id
+              ContactId → Contacts.Id
+              Type
+              PhoneNumber
+```
+
+**Uživatelské rozhraní:** Přehled kontaktů a pohodlný editační formulář kontaktu. V detailu kontaktu bude možné přímo zobrazovat, přidávat, upravovat a odebírat libovolný počet telefonních čísel. U každého čísla bude výběrové pole pro typ telefonu a vstupní pole pro samotné číslo. Ovládání má být přehledné a umožňovat editaci kontaktu i jeho telefonních čísel bez zbytečného přecházení mezi stránkami.
+
+Dosavadní demonstrační implementace eviduje jméno, příjmení a jedno telefonní číslo; výše uvedený model a editor představují **požadovaný cílový stav**, nikoli potvrzení, že už jsou implementovány.
+
+Dosavadní REST API:
 - `GET /api/contacts` — načtení kontaktů
 - `POST /api/contacts` — vytvoření kontaktu
 - `DELETE /api/contacts/:id` — odstranění kontaktu
+
+**Plánované rozšíření REST API:** operace pro načítání, přidávání, úpravy a mazání telefonních čísel konkrétního kontaktu (např. `/api/contacts/:contactId/telephone-numbers`), včetně validace typu a čísla. Konkrétní kontrakt API se upřesní při implementaci.
 
 ## Spuštění na macOS
 
