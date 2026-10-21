@@ -3,10 +3,13 @@
 // type je optionSet: odkazuje na sdileny katalog telephoneType v model.metadata.json.
 {
   "schemaVersion": 1,
+  // Technicky nazev entity.
   "logicalName": "telephone",
   "collectionName": "telephones",
+  // Primarni GUID atribut.
   "primaryIdAttribute": "id",
   "primaryNameAttribute": "phoneNumber",
+  // Lokalizovane nazvy entity.
   "displayNames": {
     "1029": "Telefon",
     "1031": "Telefon",
@@ -17,6 +20,7 @@
     "1031": "Telefonnummern",
     "1033": "Telephone numbers"
   },
+  // contactId je lookup, type je optionSet, phoneNumber je string.
   "attributes": [
     {
       "logicalName": "id",
