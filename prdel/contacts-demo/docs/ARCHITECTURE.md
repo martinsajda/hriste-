@@ -65,3 +65,24 @@ Pro všechny model-driven komponenty je referenčním doménovým modelem **Micr
 **Důsledky a hranice:** Metadata entity, atributů, relací a option setů jsou oddělena od záznamů. Layout formulářů a gridů je další samostatná vrstva. `EntityReference`, `Money`, `OptionSetValue`, `OptionSetValueCollection`, `AliasedValue` a další SDK hodnotové objekty nesmějí být ztrátově redukovány na primitivní typy. Datové providery odpovídají za mapování fyzických SQLite/SQL/Dataverse typů na jednotný doménový kontrakt.
 
 **Řízení rozporů:** Starší návrhy s textovým option setem `TelephoneNumbers.Type`, plochými CRUD DTO nebo jinou strukturou jsou **legacy kontrakty**, nikoliv definice cílového model-driven kontraktu. Stávající implementace a endpointy se nemění automaticky tímto ADR; před implementací je nutná explicitní migrační specifikace. Předchozí konvence camelCase JSON vlastností a lowercase logických názvů platí, pokud nekolidují s věrností SDK sémantice; originální názvy SDK jsou dokumentovány a jejich JSON mapování je explicitní.
+
+
+## ADR-2026-10-21: Oddělení model-driven datového modelu od servisních operací
+
+**Stav: SCHVÁLENO — závazné, klíčové architektonické pravidlo.**
+
+**Princip:** Framework standardizuje **význam a strukturu metadat a dat** (sémantika `Microsoft.Xrm.Sdk` a `Microsoft.Xrm.Sdk.Metadata`, vlastní verzovaný JSON wire kontrakt), **nikoli způsob získání, změny nebo uložení dat**. Abstrakce fyzických datových zdrojů a aplikačních operací je základním cílem frameworku. Převzetí SDK typového systému **neznamená** převzetí `IOrganizationService`, generického CRUD API ani Dataverse/OData endpointů.
+
+### Závazné hranice odpovědnosti
+
+1. **Model-driven frontend** (grid, form, lookup) interpretuje typované entity, kolekce, metadata a samostatná layout metadata. Nezná Dataverse SDK servisní metody, SQL, FetchXML ani fyzické tabulky.
+2. **REST API je aplikačně a entitně specifické.** Každý backend definuje explicitní kontrakty pro své konkrétní entity a scénáře (např. `/api/contacts`, `/api/orders`). Framework **nevyžaduje a nedefinuje** univerzální endpointy typu `/api/entities/{logicalName}/retrieveMultiple` nebo veřejné rozhraní `create/update/delete/retrieve/retrieveMultiple` po vzoru Dataverse.
+3. **Metadata mohou deklarativně popsat volání konkrétních HTTP operací** pro načtení seznamu/záznamu, uložení či jinou akci: URL/route, HTTP metodu, parametry a mapování požadavku/odpovědi. Jde o **konfiguraci integrace UI**, nikoli o obecné Dataverse CRUD rozhraní. Přesný konfigurační kontrakt se dopracuje před implementací; zde uvedený princip není schválením konkrétního JSON Schema.
+4. **Backendová aplikační logika a interní providery** rozhodují o implementaci operací: SQL, SQLite, FetchXML, `IOrganizationService.RetrieveMultiple`, `Create`, `Update`, externí REST, agregace a transformace. Framework jejich interní metody, strukturu tříd ani transakční strategii nepředepisuje.
+5. **Jedna logická entita nemusí odpovídat jedné tabulce ani jednomu zdroji.** Backend může sestavit typově věrnou `Entity`/`EntityCollection` z více nezávislých systémů; původ atributů je pro renderer transparentní. Identita, metadata a hodnoty výsledné entity musejí respektovat sjednaný datový kontrakt.
+6. **Oddělit datový kontrakt od endpointu.** Různá aplikační REST API mohou vracet stejný SDK-inspirovaný JSON tvar; endpoint může také používat explicitně definovanou obálku či transformaci, pokud je integrace s rendererem jednoznačná a typová informace se neztratí.
+7. **Nezavádět povinný `IDataProvider` s CRUD metodami jako veřejné rozhraní frameworku.** Případný interní provider/adaptér s těmito metodami je implementační detail konkrétního backendu. Termín „provider“ v dosavadních dokumentech neimplikuje univerzální veřejnou servisní smlouvu.
+
+**Kompatibilita:** Existující konkrétní CRUD endpointy Contacts Demo v [API.md](API.md) mohou zůstat aplikačním REST kontraktem prototypu; nejsou však vzorem ani povinností pro všechny entity či další projekty. Starší diagramy s `DataProvider` nebo „jednotným REST kontraktem“ je nutné vykládat jako jednotnou **sémantiku datového modelu**, nikoli jako povinnou sadu CRUD metod nebo identických URL. Přesný budoucí formát payloadů a migrace legacy DTO jsou samostatné úkoly.
+
+**Odložené téma:** Zápis jedné logické entity do více nezávislých zdrojů a handling částečných selhání je evidován v [ARCHITECTURE_TODO.md](ARCHITECTURE_TODO.md), úkol A01; tímto ADR se neřeší.
