@@ -181,7 +181,7 @@ Příklad konvence:
 
 ### JSON metadata a univerzální renderer
 
-**Schválený kontrakt gridů v1:** [GRID_METADATA.md](docs/GRID_METADATA.md). Grid podporuje klientské i serverové stránkování, vícesloupcové výchozí řazení, REST datový zdroj, sloupce s nadpisy, volbu počtu řádků a výběr řádků. Volitelné stránkovací REST parametry jsou specifikovány také v [API.md](docs/API.md). Renderer dosud neimplementujeme.
+**Schválený kontrakt gridů v1:** [GRID_METADATA.md](docs/GRID_METADATA.md). Grid podporuje klientské i serverové stránkování, vícesloupcové výchozí řazení, REST datový zdroj, sloupce s nadpisy, volbu počtu řádků, výběr řádků a fulltextové filtrování jednotlivých sloupců (`contains`) v klientském i serverovém režimu. Volitelné stránkovací REST parametry jsou specifikovány také v [API.md](docs/API.md). Renderer dosud neimplementujeme.
 
 
 Metadatové definice musí podporovat minimálně:
@@ -232,7 +232,7 @@ Jeden agent řeší databázi, REST API, metadata-driven frontend i testování 
 ## Dokumentace, historie a vizuální návrh
 
 - [Datový model](docs/DATOVY_MODEL.md) — závazný popis entit, GUID a vztahů.
-- [REST API](docs/API.md) — závazný popis všech 10 CRUD operací včetně volitelného stránkování seznamů.
+- [REST API](docs/API.md) — závazný popis všech 10 CRUD operací včetně volitelného stránkování a sloupcových filtrů seznamů.
 - [Metadata gridů](docs/GRID_METADATA.md) — schválené JSON schéma gridů, klientské a serverové stránkování.
 - [Architektura](docs/ARCHITECTURE.md) — technologické vrstvy, lokální provoz a plánované portace.
 - [DEPLOY.md](DEPLOY.md) — budoucí automatizované nahrávání na PHP webhosting přes FTP/FTPS/SFTP.
