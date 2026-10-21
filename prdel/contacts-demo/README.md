@@ -86,12 +86,60 @@ Contacts (1)
 
 Dosavadní demonstrační implementace eviduje jméno, příjmení a jedno telefonní číslo; výše uvedený model a editor představují **požadovaný cílový stav**, nikoli potvrzení, že už jsou implementovány.
 
-Dosavadní REST API:
-- `GET /api/contacts` — načtení kontaktů
-- `POST /api/contacts` — vytvoření kontaktu
-- `DELETE /api/contacts/:id` — odstranění kontaktu
+## REST API v1 — návrh kontraktu
 
-**Plánované rozšíření REST API:** operace pro načítání, přidávání, úpravy a mazání telefonních čísel konkrétního kontaktu (např. `/api/contacts/:contactId/telephone-numbers`), včetně validace typu a čísla. Konkrétní kontrakt API se upřesní při implementaci.
+Základní adresa: `http://localhost:3000/api`. Komunikace probíhá přes HTTP s JSON těly požadavků a odpovědí (`Content-Type: application/json`). Identifikátory jsou v URL; pro vytvoření nového záznamu je přiděluje server.
+
+### Kontakty (Contacts)
+
+| Metoda | Endpoint | Význam |
+| --- | --- | --- |
+| `GET` | `/api/contacts` | Seznam kontaktů |
+| `POST` | `/api/contacts` | Založení kontaktu |
+| `PUT` | `/api/contacts/:id` | Úprava kontaktu |
+| `DELETE` | `/api/contacts/:id` | Smazání kontaktu |
+
+Příklad těla pro `POST` a `PUT`:
+
+```json
+{
+  "firstName": "Jan",
+  "lastName": "Novák"
+}
+```
+
+### Telefonní čísla (TelephoneNumbers)
+
+| Metoda | Endpoint | Význam |
+| --- | --- | --- |
+| `GET` | `/api/contacts/:contactId/telephone-numbers` | Seznam telefonních čísel daného kontaktu |
+| `POST` | `/api/contacts/:contactId/telephone-numbers` | Přidání telefonního čísla ke kontaktu |
+| `PUT` | `/api/contacts/:contactId/telephone-numbers/:phoneId` | Úprava konkrétního telefonního čísla |
+| `DELETE` | `/api/contacts/:contactId/telephone-numbers/:phoneId` | Smazání konkrétního telefonního čísla |
+
+Příklad těla pro `POST` a `PUT`:
+
+```json
+{
+  "type": "mobile",
+  "phoneNumber": "+420 777 123 456"
+}
+```
+
+`type` je option set s povolenými hodnotami `mobile` (mobil), `landline` (pevná linka), `fax`, `work` (pracovní), `other` (jiný). `phoneNumber` je textový řetězec. `contactId` se bere z URL a nelze jej měnit tělem požadavku.
+
+### Pravidla API
+
+- `GET` vrací `200 OK` a JSON pole; prázdný seznam je `[]`.
+- `POST` při úspěchu vrací `201 Created`, JSON nového záznamu včetně ID a hlavičku `Location`.
+- `PUT` při úspěchu vrací `200 OK` s upraveným záznamem. `PUT` představuje úplnou aktualizaci editovatelných polí.
+- `DELETE` při úspěchu vrací `204 No Content`.
+- Neexistující kontakt nebo telefonní číslo: `404 Not Found`; chybné vstupy či nepovolený typ: `400 Bad Request`.
+- Úprava a smazání telefonního čísla musí ověřit, že `phoneId` skutečně patří ke kontaktu `contactId`.
+- Při odstranění kontaktu se odstraní i všechna jeho telefonní čísla; databázová vazba bude mít `ON DELETE CASCADE` a aktivní SQLite foreign keys (`PRAGMA foreign_keys = ON`).
+- REST vrstva pouze validuje a obsluhuje HTTP; databázové operace provádí oddělená provider/repository vrstva.
+
+**Stav:** Jde o cílový návrh kontraktu. Není tím potvrzeno, že jsou všechny endpointy již implementovány.
 
 ## Spuštění na Windows
 
