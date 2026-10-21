@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/contacts-demo/schemas/grid-view.schema.json",
   "title": "Saved grid view v2",
   "description": "Uživatelský pohled je samostatný stav, nikoli součást definičního JSON gridu.",
   "type": "object",
