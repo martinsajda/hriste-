@@ -41,6 +41,7 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 - GitHub: zdrojové kódy, Markdown, JSON metadata a textové specifikace.
 - Google Drive: binární dokumentace projektu ve složce `Context Demo/Dokumentace/Návrh` a případných dalších podsložkách.
 - Schválený vizuální návrh: https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view
+- PNG vizuálního návrhu je uložen **výhradně na Google Drive**. Necommituj ani nepushuj jeho kopii do GitHubu.
 
 ## Průběžný záznam konverzace
 
