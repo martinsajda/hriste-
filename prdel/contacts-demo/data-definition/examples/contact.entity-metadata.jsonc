@@ -1,0 +1,74 @@
+// Metadata entity contact: definice typu a pravidel, nikoliv konkretni zaznam.
+// primaryNameAttribute=lastName je pro demo jen navrh; slozene cele jmeno se jeste rozhodne.
+// logicalName atributu musi odpovidat klicum v attributes datoveho zaznamu.
+{
+  "schemaVersion": 1,
+  "logicalName": "contact",
+  "collectionName": "contacts",
+  "primaryIdAttribute": "id",
+  "primaryNameAttribute": "lastName",
+  "displayNames": {
+    "1029": "Kontakt",
+    "1031": "Kontakt",
+    "1033": "Contact"
+  },
+  "displayCollectionNames": {
+    "1029": "Kontakty",
+    "1031": "Kontakte",
+    "1033": "Contacts"
+  },
+  "attributes": [
+    {
+      "logicalName": "id",
+      "type": "guid",
+      "required": true,
+      "primaryId": true,
+      "readOnly": true,
+      "labels": {
+        "1029": "ID",
+        "1031": "ID",
+        "1033": "ID"
+      }
+    },
+    {
+      "logicalName": "firstName",
+      "type": "string",
+      "required": true,
+      "labels": {
+        "1029": "Jméno",
+        "1031": "Vorname",
+        "1033": "First name"
+      }
+    },
+    {
+      "logicalName": "lastName",
+      "type": "string",
+      "required": true,
+      "labels": {
+        "1029": "Příjmení",
+        "1031": "Nachname",
+        "1033": "Last name"
+      }
+    },
+    {
+      "logicalName": "address",
+      "type": "string",
+      "required": false,
+      "labels": {
+        "1029": "Adresa",
+        "1031": "Adresse",
+        "1033": "Address"
+      }
+    },
+    {
+      "logicalName": "description",
+      "type": "string",
+      "required": false,
+      "labels": {
+        "1029": "Popis",
+        "1031": "Beschreibung",
+        "1033": "Description"
+      }
+    }
+  ]
+}
