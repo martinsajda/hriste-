@@ -1,0 +1,434 @@
+// Ukázka definice GRID Metadata v2 s vysvětlujícími komentáři.
+// Tento soubor je pro čtení a úpravy návrhu; běhová konfigurace je contacts.grid.json.
+// JSONC dovoluje komentáře, ale není standardní JSON. Do rendereru načítejte .json.
+{
+  // Odkaz na JSON Schema pro IntelliSense ve VS Code.
+  "$schema": "../schemas/grid.schema.json",
+  "schemaVersion": 2,
+  "id": "contacts-grid",
+  "type": "grid",
+  "entity": "contact",
+
+  // Data se načítají přes GET; pro pokročilé filtrování je připraven POST /search.
+  "dataSource": {
+    "type": "rest",
+    "endpoint": "/api/contacts",
+    "method": "GET",
+    "response": { "idField": "id" },
+    "advancedSearch": {
+      "enabled": true,
+      "endpoint": "/api/contacts/search",
+      "method": "POST",
+      "requestMode": "structured",
+      "response": {
+        "itemsPath": "items",
+        "pagePath": "pagination.page",
+        "pageSizePath": "pagination.pageSize",
+        "totalItemsPath": "pagination.totalItems",
+        "totalPagesPath": "pagination.totalPages"
+      }
+    }
+  },
+
+  // Každý sloupec má technický field a LCID překlady. Formátování je pouze prezentační.
+  "columns": [
+    // Jméno
+    {
+      "field": "firstName",
+      "dataType": "string",
+      "labels": {
+        "1029": "Jméno",
+        "1031": "Vorname",
+        "1033": "First name"
+      },
+      "visible": true,
+      "width": 160,
+      "minWidth": 100,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": true,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    },
+    // Příjmení: otevření detailu
+    {
+      "field": "lastName",
+      "dataType": "string",
+      "labels": {
+        "1029": "Příjmení",
+        "1031": "Nachname",
+        "1033": "Last name"
+      },
+      "visible": true,
+      "width": 190,
+      "minWidth": 100,
+      "maxWidth": 500,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": true,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    },
+    // Adresa
+    {
+      "field": "address",
+      "dataType": "string",
+      "labels": {
+        "1029": "Adresa",
+        "1031": "Adresse",
+        "1033": "Address"
+      },
+      "visible": true,
+      "width": 240,
+      "minWidth": 100,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": true,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    },
+    // Popis: skrytý ve výchozím pohledu
+    {
+      "field": "description",
+      "dataType": "string",
+      "labels": {
+        "1029": "Popis",
+        "1031": "Beschreibung",
+        "1033": "Description"
+      },
+      "visible": false,
+      "width": 300,
+      "minWidth": 100,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": false,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    }
+  ],
+
+  // Vícesloupcové řazení a stránkování. Pro serverové stránkování změňte mode a mapování.
+  "sorting": {
+    "enabled": true,
+    "default": [
+      {
+        "field": "lastName",
+        "direction": "asc"
+      },
+      {
+        "field": "firstName",
+        "direction": "asc"
+      }
+    ]
+  },
+  "pagination": {
+    "enabled": true,
+    "mode": "client",
+    "defaultPageSize": 20,
+    "pageSizeOptions": [
+      10,
+      20,
+      50,
+      100
+    ],
+    "showTotalCount": true
+  },
+
+  // Globální hledání: OR přes fields, výsledek AND se sloupcovými filtry.
+  "filtering": {
+    "enabled": true,
+    "display": "columnHeader",
+    "combine": "and",
+    "defaultOperator": "contains",
+    "caseSensitive": false,
+    "globalSearch": {
+      "enabled": true,
+      "fields": [
+        "firstName",
+        "lastName",
+        "address"
+      ],
+      "operator": "contains",
+      "debounceMs": 350,
+      "minLength": 2
+    },
+    "operators": {
+      "string": [
+        "contains",
+        "equals",
+        "startsWith",
+        "endsWith",
+        "isEmpty"
+      ],
+      "integer": [
+        "equals",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "between",
+        "isEmpty"
+      ],
+      "decimal": [
+        "equals",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "between",
+        "isEmpty"
+      ],
+      "date": [
+        "equals",
+        "before",
+        "after",
+        "between",
+        "isEmpty"
+      ],
+      "datetime": [
+        "equals",
+        "before",
+        "after",
+        "between",
+        "isEmpty"
+      ],
+      "boolean": [
+        "equals",
+        "isEmpty"
+      ],
+      "enum": [
+        "in",
+        "notIn",
+        "isEmpty"
+      ]
+    }
+  },
+  "selection": {
+    "mode": "multiple",
+    "showCheckboxes": true,
+    "selectAllScope": "currentPage"
+  },
+  "recordOpening": {
+    "enabled": true,
+    "trigger": "column",
+    "field": "lastName",
+    "target": {
+      "type": "form",
+      "entity": "contact",
+      "form": "detail"
+    }
+  },
+
+  // Registr handlerů; v JSON není žádný spustitelný JavaScript.
+  "actions": [
+    {
+      "id": "create",
+      "handler": "openForm",
+      "target": {
+        "entity": "contact",
+        "form": "detail",
+        "mode": "create"
+      },
+      "labels": {
+        "1029": "Nový kontakt",
+        "1031": "Neuer Kontakt",
+        "1033": "New contact"
+      },
+      "icon": "plus",
+      "selection": "none"
+    },
+    {
+      "id": "open",
+      "handler": "openForm",
+      "target": {
+        "entity": "contact",
+        "form": "detail",
+        "mode": "edit"
+      },
+      "labels": {
+        "1029": "Otevřít",
+        "1031": "Öffnen",
+        "1033": "Open"
+      },
+      "icon": "external-link",
+      "selection": "single"
+    },
+    {
+      "id": "delete",
+      "handler": "deleteRecords",
+      "selection": "oneOrMore",
+      "confirmation": {
+        "required": true,
+        "messageKey": "confirmDelete"
+      },
+      "labels": {
+        "1029": "Odstranit",
+        "1031": "Löschen",
+        "1033": "Delete"
+      },
+      "icon": "trash-2"
+    },
+    {
+      "id": "refresh",
+      "handler": "refreshGrid",
+      "selection": "any",
+      "labels": {
+        "1029": "Obnovit",
+        "1031": "Aktualisieren",
+        "1033": "Refresh"
+      },
+      "icon": "refresh-cw"
+    },
+    {
+      "id": "export",
+      "handler": "exportGrid",
+      "selection": "any",
+      "labels": {
+        "1029": "Exportovat",
+        "1031": "Exportieren",
+        "1033": "Export"
+      },
+      "icon": "download"
+    }
+  ],
+  "toolbar": {
+    "enabled": true,
+    "actions": [
+      "create",
+      "delete",
+      "refresh",
+      "export"
+    ]
+  },
+  "contextMenu": {
+    "enabled": true,
+    "actions": [
+      "open",
+      "delete"
+    ]
+  },
+
+  // Uživatelské změny se ukládají mimo definici gridu.
+  "views": {
+    "enabled": true,
+    "defaultViewId": "default",
+    "allowCreate": true,
+    "allowRename": true,
+    "allowDelete": true,
+    "allowSetDefault": true,
+    "persistence": {
+      "provider": "localStorage",
+      "key": "contacts-grid.views",
+      "scope": "user"
+    },
+    "save": {
+      "columnOrder": true,
+      "columnVisibility": true,
+      "columnWidths": true,
+      "columnPinning": true,
+      "sorting": true,
+      "filters": true,
+      "pageSize": true
+    }
+  },
+
+  // Export filtered v serverovém režimu musí zahrnovat všechny odpovídající záznamy.
+  "export": {
+    "enabled": true,
+    "formats": [
+      "csv",
+      "xlsx"
+    ],
+    "defaultFormat": "xlsx",
+    "scopes": [
+      "currentPage",
+      "filtered",
+      "selected"
+    ],
+    "defaultScope": "filtered",
+    "columns": "visible",
+    "respectColumnOrder": true,
+    "respectSorting": true,
+    "useLocalizedHeaders": true,
+    "csv": {
+      "delimiter": ";",
+      "encoding": "utf-8",
+      "includeBom": true
+    },
+    "xlsx": {
+      "sheetName": "Contacts",
+      "freezeHeader": true,
+      "autoFilter": true
+    }
+  },
+
+  // Výchozí LCID je centrálně v app.config.json, zde jsou pouze texty gridu.
+  "localization": {
+    "labels": {
+      "1029": {
+        "title": "Moje kontakty",
+        "confirmDelete": "Opravdu odstranit vybrané záznamy?"
+      },
+      "1031": {
+        "title": "Meine Kontakte",
+        "confirmDelete": "Ausgewählte Datensätze löschen?"
+      },
+      "1033": {
+        "title": "My Contacts",
+        "confirmDelete": "Delete the selected records?"
+      }
+    }
+  }
+}
