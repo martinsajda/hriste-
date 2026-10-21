@@ -262,3 +262,7 @@ Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřej
 ## Rozhodnutí: testování rendereru pouze přes HTTP/HTTPS
 
 Režim `file://` a zabalená metadata v JS jsou vyřazeny. Metadata se vždy načítají přes `fetch()` ze statických JSON souborů. Data mají dva režimy: `mock` (statický JSON a klientský adaptér, bez backendu/DB) a `rest` (skutečné API a databáze). Lokální statický webserver, IIS i Apache poskytují stejný frontend. Viz [DATA_SOURCE_TESTING.md](docs/DATA_SOURCE_TESTING.md). Implementace je odložena do fáze vývoje rendereru.
+
+## Model-driven datová definice
+
+Schválený princip: **metadata datového modelu a entit jsou oddělena od runtime dat**; grid a budoucí formulář kombinují EntityMetadata, vlastní layout metadata a Entity/EntityCollection. Běžné atributy jsou nativní JSON hodnoty bez `{type,value}` obálky; lookup je EntityReference. Návrh, JSON/JSONC příklady a JSON Schema jsou v [data-definition/README.md](data-definition/README.md) a [data-definition/ENTITY_CONTRACT.md](data-definition/ENTITY_CONTRACT.md). Stávající REST API v1 se tím zatím nemění.
