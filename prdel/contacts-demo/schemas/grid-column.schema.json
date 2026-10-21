@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/contacts-demo/schemas/grid-column.schema.json",
   "title": "Grid column metadata v2",
   "description": "Definice jediného sloupce univerzálního gridu; hodnoty default jsou anotace, které musí renderer sám aplikovat.",
   "type": "object",
