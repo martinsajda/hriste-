@@ -2,7 +2,7 @@
 
 ## Cíl projektu
 
-Cílem projektu je vytvořit jednoduchou lokální webovou aplikaci pro evidenci kontaktů, která bude fungovat na macOS bez cloudové infrastruktury a bez nutnosti instalovat samostatný databázový server.
+Cílem projektu je vytvořit jednoduchou lokální webovou aplikaci pro evidenci kontaktů, která bude fungovat na Windows bez cloudové infrastruktury a bez nutnosti instalovat samostatný databázový server.
 
 Aplikace bude postavena na třech vrstvách:
 
@@ -13,7 +13,7 @@ Aplikace bude postavena na třech vrstvách:
 ### Architektura
 
 ```text
-Webový prohlížeč (Safari)
+Webový prohlížeč (Edge / Chrome)
   └── Statické HTML + CSS + JavaScript
         │ HTTP / REST API
         ▼
@@ -34,7 +34,7 @@ Následující diagram je ve formátu Mermaid a GitHub jej vykreslí přímo v R
 
 ```mermaid
 flowchart TB
-    U["Uživatel / Safari"]
+    U["Uživatel / Edge nebo Chrome"]
     FE["Frontend<br/>statické HTML + CSS + JavaScript"]
     HTTP["Lokální HTTP server<br/>Node.js · 127.0.0.1:3000"]
     API["REST API<br/>/api/contacts · telefonní čísla"]
@@ -93,17 +93,17 @@ Dosavadní REST API:
 
 **Plánované rozšíření REST API:** operace pro načítání, přidávání, úpravy a mazání telefonních čísel konkrétního kontaktu (např. `/api/contacts/:contactId/telephone-numbers`), včetně validace typu a čísla. Konkrétní kontrakt API se upřesní při implementaci.
 
-## Spuštění na macOS
+## Spuštění na Windows
 
-Vyžaduje Node.js **22.13+** (doporučeno aktuální LTS) a npm.
+Cílové prostředí: **Windows 10/11**. Vyžaduje nainstalovaný Node.js **22.13+** (doporučeno aktuální LTS) a npm. Příkazy spusť v PowerShellu nebo terminálu VS Code v kořenovém adresáři repozitáře.
 
-```bash
-cd prdel/contacts-demo
+```powershell
+cd prdel\contacts-demo
 npm install
 npm start
 ```
 
-Otevři v Safari **http://localhost:3000**. Ukončení: Ctrl+C. SQLite databáze vznikne automaticky v `data/contacts.db`; tento soubor se necommituje.
+Otevři v Edge nebo Chrome **http://localhost:3000**. Ukončení: Ctrl+C. SQLite databáze vznikne automaticky v `data/contacts.db`; tento soubor se necommituje.
 
 **Neotevírej `index.html` přes file://** — frontend volá API běžící na stejném lokálním serveru. Server poslouchá jen na `127.0.0.1`, ne na celé síti.
 
@@ -128,4 +128,4 @@ Projekt počítá s jedním hlavním Codex orchestrátorem a čtyřmi rolemi: DB
 
 ## Bezpečnost a stav
 
-Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je připravený k experimentu; agenti zatím nebyli skutečně spuštěni. **Na Macu ani v Safari aplikace zatím nebyla spuštěna a otestována.**
+Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je připravený k experimentu; agenti zatím nebyli skutečně spuštěni. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
