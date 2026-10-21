@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contacts-demo/schemas/grid-view.schema.json",
+  "title": "Saved grid view v2",
+  "description": "Uživatelský pohled je samostatný stav, nikoli součást definičního JSON gridu.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "gridId",
+    "name"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "id": {
+      "type": "string",
+      "description": "Unikátní identifikátor pohledu.",
+      "minLength": 1
+    },
+    "gridId": {
+      "type": "string",
+      "description": "ID gridu.",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Název pohledu.",
+      "minLength": 1
+    },
+    "columns": {
+      "type": "array",
+      "description": "Uživatelské pořadí, viditelnost, šířky a připnutí.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Technický název sloupce."
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "visible": {
+            "type": "boolean"
+          },
+          "width": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "const": "auto"
+              }
+            ]
+          },
+          "pinned": {
+            "type": "string",
+            "description": "Připnutí.",
+            "enum": [
+              "none",
+              "left",
+              "right"
+            ]
+          }
+        }
+      }
+    },
+    "sorting": {
+      "type": "array",
+      "description": "Uložené řazení.",
+      "items": {
+        "$ref": "#/$defs/sort"
+      }
+    },
+    "filters": {
+      "type": "array",
+      "description": "Uložené sloupcové filtry.",
+      "items": {
+        "$ref": "#/$defs/filterCondition"
+      }
+    },
+    "globalSearch": {
+      "type": "string",
+      "description": "Uložený globální dotaz."
+    },
+    "pageSize": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "sort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "direction"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      }
+    },
+    "filterCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "operator"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "value": {
+          "description": "Hodnota podle operátoru; between/in používají pole."
+        }
+      }
+    }
+  }
+}
