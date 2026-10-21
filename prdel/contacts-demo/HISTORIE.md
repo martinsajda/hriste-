@@ -180,6 +180,44 @@ Tento soubor je **chronologický záznam dialogu**, nikoli syntéza zadání. Sy
 
 > [Odpověď na tuto repliku následuje v chatu po vytvoření souboru.]
 
+
+## 2026-10-21 — odpověď k historii a nová revize
+
+**Asistent (odpověď k založení historie, přesné znění textu):**
+
+> Ano. Založil jsem v GitHubu nový soubor:
+>
+> **HISTORIE.md – historie konverzace**
+>
+> Commit: `1e6c69d`
+>
+> Oddělíme tím dvě věci: `HISTORIE.md` bude sloužit jako chronologický záznam našeho rozhovoru, zatímco `README.md`, `API.md` a další dokumenty budou obsahovat výslednou technickou specifikaci.
+>
+> Jedno důležité upřesnění: **první verze historie zatím není úplný doslovný přepis celého vlákna**. Obsahuje přesné dostupné uživatelské repliky, ale některé moje delší odpovědi jsou zkrácené. Starší části konverzace nemám dostupné v úplném znění, takže je nechci vymýšlet.
+>
+> Odteď budu při další práci na projektu průběžně doplňovat dostupný dialog do historie. Nemohu však zapisovat automaticky na pozadí mimo aktivní konverzaci.
+>
+> Soubor si můžeš zkontrolovat a upravit. Budeme ho brát jako pracovní archiv, ne jako finální specifikaci.
+
+**Uživatel:**
+
+> Tak teď uděláme zase revizi stavu toho zadání.
+
+**Asistent (začátek aktuální revize, přesný text bez tabulkového formátování):**
+
+> Revize zadání – 21. října 2026.
+>
+> Znovu jsem zkontroloval aktuální dokumenty na GitHubu. Tentokrát už hodnotím také nový režim **jediného vývojového agenta** a požadavek na průběžnou historii konverzace.
+>
+> **Celkový závěr: Funkční a backendové zadání je prakticky uzavřené. Zbývá dokončit specifikaci univerzálního frontendu a sjednotit dokumentaci.**
+>
+> Stav: datový model, REST API, Node.js/SQLite a jednoagentní režim jsou uzavřené. Historie je založena, ale neúplná. JSON metadata, sjednocení starších dokumentů a akceptační testy čekají.
+>
+> Zjištění: README obsahuje staré vnořené telefonní endpointy a neúplná pole formulářů; ARCHITECTURE.md popisuje jen macOS; AGENTS.md zatím neobsahuje explicitní pravidlo pro průběžné doplňování historie.
+
+**Poznámka archivace:** Aktuální asistentská odpověď byla v chatu částečně vykreslena jako tabulka a interaktivní prvky. Zde je zapsán její obsah, nikoliv doslovná podoba všech UI prvků.
+
+
 ---
 
 ## Pokračování
