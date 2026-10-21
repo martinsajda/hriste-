@@ -1,0 +1,27 @@
+{
+  "entityName": "telephone",
+  "entities": [
+    {
+      "logicalName": "telephone",
+      "id": "c83eb3ae-a19b-4eb8-9675-19a67f8390c3",
+      "attributes": {
+        "id": "c83eb3ae-a19b-4eb8-9675-19a67f8390c3",
+        "contactId": {
+          "logicalName": "contact",
+          "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+          "name": "Jana Nováková"
+        },
+        "type": "mobile",
+        "phoneNumber": "+420 777 123 456",
+        "description": null
+      }
+    }
+  ],
+  "paging": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 1,
+    "totalPages": 1,
+    "moreRecords": false
+  }
+}
