@@ -141,6 +141,151 @@ Příklad těla pro `POST` a `PUT`:
 
 **Stav:** Jde o cílový návrh kontraktu. Není tím potvrzeno, že jsou všechny endpointy již implementovány.
 
+## Uživatelské rozhraní — cílová specifikace
+
+### Obecný princip: metadata-driven UI
+
+Frontend bude tvořen statickým HTML souborem (aplikační shell), CSS a JavaScriptem. **Konkrétní gridy, formuláře a jejich pole nebudou napevno napsané v HTML.** Budou deklarovány v samostatných JSON metadatech inspirovaných strukturou formulářů, pohledů a vztahů v Dynamics 365 CE / Dataverse. Univerzální JavaScript renderer tato metadata načte, vykreslí příslušné UI a napojí je na REST API. Konfigurace bude oddělená od rendereru a od databázových providerů.
+
+### Hlavní obrazovka a navigace
+
+- Nahoře bude hlavička / stavový řádek s logem nebo názvem aplikace **Contacts Demo**.
+- Navigační menu bude obsahovat položku **Kontakty**.
+- Výchozí obrazovkou bude **dashboard** s dlaždicí **Moje kontakty**.
+- Pod dlaždicí bude **grid kontaktů** (seznam kontaktů), načítaný přes REST API.
+- Kliknutí na řádek nebo odkaz kontaktu otevře **detail kontaktu**.
+- Grid kontaktů bude obsahovat akce pro založení a smazání kontaktu; smazání bude potvrzováno vlastním dialogem.
+
+### Formulář detailu kontaktu
+
+- Detail kontaktu bude editovatelný formulář s poli **jméno**, **příjmení** a výhledově dalšími poli (např. **poznámky**); rozšíření datového modelu o tato pole se upřesní později.
+- Formulář bude podporovat uložení změn a zrušení editace.
+- Pod hlavní částí formuláře bude **subgrid telefonních čísel** navázaný vztahem Contacts 1:N TelephoneNumbers.
+- Subgrid bude načítat pouze telefony otevřeného kontaktu.
+- V subgridu bude tlačítko **+** pro přidání telefonu, otevření telefonu kliknutím na řádek a ikona **koše** pro jeho smazání.
+
+### Formulář telefonního čísla
+
+- Kliknutí na **+** otevře formulář nového telefonu.
+- Kliknutí na existující řádek v subgridu otevře tentýž formulář s předvyplněnými údaji.
+- Formulář obsahuje **Type** jako option set (mobil, pevná linka, fax, pracovní, jiný) a **PhoneNumber** jako textový vstup.
+- Akce **Uložit** provede vytvoření nebo změnu přes REST API; **Zrušit** zavře formulář bez uložení.
+- Vazba na nadřazený kontakt se předává z kontextu detailu kontaktu, nikoli jako volně editovatelné pole.
+
+### Mazání a potvrzovací dialogy
+
+- V gridu kontaktů i subgridu telefonů bude u záznamu ikona koše.
+- Před odstraněním se otevře **vlastní modální potvrzovací formulář** s otázkou typu „Opravdu chcete smazat kontakt?“ / „Opravdu chcete smazat telefonní číslo?“ a volbami **Ano / Ne**.
+- **Nepoužívat nativní `alert()` ani `confirm()`.**
+- **Ano** zavolá odpovídající DELETE endpoint a po úspěchu aktualizuje grid; **Ne** dialog zavře bez změny.
+- Při mazání kontaktu je vhodné upozornit, že se spolu s ním smažou i jeho telefonní čísla (kaskádové odstranění).
+
+### JSON metadata a univerzální renderer
+
+Metadatové definice musí podporovat minimálně:
+
+1. **Navigaci a dashboard** — menu, dlaždice, cílové pohledy.
+2. **Entity a data source/provider** — logický název entity, REST endpoint, metody GET/POST/PUT/DELETE, identifikační pole a mapování datových polí na JSON vlastnosti API.
+3. **Grid (view)** — sloupce, popisky, pořadí, zdroj dat, akce pro nový záznam / otevření / smazání.
+4. **Formulář (form)** — sekce, pořadí a typy polí, popisky, editovatelnost, povinná pole, tlačítka Uložit / Zrušit a mapování na API.
+5. **Subgrid / vztah** — nadřazená a podřízená entita, vztah 1:N, vazební pole `ContactId`, endpoint závislý na ID otevřeného kontaktu.
+6. **Option set** — stabilní hodnoty a zobrazované popisky (např. `mobile` → Mobil).
+7. **Dialogy a akce** — konfigurovatelné potvrzení mazání a vazba akcí na příslušné REST operace.
+
+Příklad **ilustrativního návrhu** metadat (finální JSON schéma se ještě upřesní):
+
+```json
+{
+  "entities": {
+    "contact": {
+      "idField": "id",
+      "provider": {
+        "list": { "method": "GET", "url": "/api/contacts" },
+        "create": { "method": "POST", "url": "/api/contacts" },
+        "update": { "method": "PUT", "url": "/api/contacts/{id}" },
+        "delete": { "method": "DELETE", "url": "/api/contacts/{id}" }
+      },
+      "fields": {
+        "firstName": { "type": "text", "label": "Jméno" },
+        "lastName": { "type": "text", "label": "Příjmení" }
+      },
+      "views": {
+        "main": {
+          "type": "grid",
+          "columns": ["firstName", "lastName"],
+          "openForm": "detail",
+          "allowCreate": true,
+          "allowDelete": true
+        }
+      },
+      "forms": {
+        "detail": {
+          "fields": ["firstName", "lastName"],
+          "subgrids": [
+            {
+              "entity": "telephoneNumber",
+              "relationField": "contactId",
+              "parentIdField": "id",
+              "view": "byContact"
+            }
+          ]
+        }
+      }
+    },
+    "telephoneNumber": {
+      "idField": "id",
+      "provider": {
+        "list": { "method": "GET", "url": "/api/contacts/{contactId}/telephone-numbers" },
+        "create": { "method": "POST", "url": "/api/contacts/{contactId}/telephone-numbers" },
+        "update": { "method": "PUT", "url": "/api/contacts/{contactId}/telephone-numbers/{id}" },
+        "delete": { "method": "DELETE", "url": "/api/contacts/{contactId}/telephone-numbers/{id}" }
+      },
+      "fields": {
+        "type": {
+          "type": "optionset",
+          "label": "Typ telefonu",
+          "options": [
+            { "value": "mobile", "label": "Mobil" },
+            { "value": "landline", "label": "Pevná linka" },
+            { "value": "fax", "label": "Fax" },
+            { "value": "work", "label": "Pracovní" },
+            { "value": "other", "label": "Jiný" }
+          ]
+        },
+        "phoneNumber": { "type": "text", "label": "Telefonní číslo" }
+      },
+      "views": {
+        "byContact": {
+          "type": "grid",
+          "columns": ["type", "phoneNumber"],
+          "openForm": "detail",
+          "allowCreate": true,
+          "allowDelete": true
+        }
+      },
+      "forms": {
+        "detail": {
+          "fields": ["type", "phoneNumber"],
+          "actions": ["save", "cancel"]
+        }
+      }
+    }
+  },
+  "navigation": [{ "label": "Kontakty", "entity": "contact", "view": "main" }],
+  "dashboard": {
+    "tiles": [{ "label": "Moje kontakty", "entity": "contact", "view": "main" }]
+  },
+  "dialogs": {
+    "confirmDelete": {
+      "type": "modal",
+      "buttons": ["yes", "no"]
+    }
+  }
+}
+```
+
+**Poznámka k rozsahu:** Jde o požadovanou cílovou architekturu a příklad metadat, nikoli o hotový renderer. Konkrétní názvy souborů, JSON schéma, komponenty a případná další pole kontaktu se mohou upřesnit při implementaci.
+
 ## Spuštění na Windows
 
 Cílové prostředí: **Windows 10/11**. Vyžaduje nainstalovaný Node.js **22.13+** (doporučeno aktuální LTS) a npm. Příkazy spusť v PowerShellu nebo terminálu VS Code v kořenovém adresáři repozitáře.
