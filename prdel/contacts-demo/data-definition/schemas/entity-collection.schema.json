@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EntityCollection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entityName",
+    "entities",
+    "paging"
+  ],
+  "properties": {
+    "entityName": {
+      "type": "string"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "paging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "page",
+        "pageSize",
+        "totalItems",
+        "totalPages",
+        "moreRecords"
+      ],
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalPages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "moreRecords": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logicalName",
+        "id",
+        "attributes"
+      ],
+      "properties": {
+        "logicalName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "$ref": "#/$defs/entityReference"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "required": [
+        "logicalName",
+        "id"
+      ],
+      "properties": {
+        "logicalName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
