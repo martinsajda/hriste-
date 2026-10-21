@@ -78,90 +78,28 @@ Pravidla přenositelnosti:
 
 ## Rozsah demonstrační aplikace
 
-Cílový datový model bude obsahovat dvě tabulky:
+Datový model v1 je **schválený** a jeho jediným závazným popisem je [DATOVY_MODEL.md](docs/DATOVY_MODEL.md).
 
-- **Contacts** — evidence kontaktů (např. jméno a příjmení).
-- **TelephoneNumbers** — telefonní čísla přiřazená ke kontaktům.
+- **Contacts:** `Id` (GUID), `FirstName`, `LastName`, `Address`, `Description`.
+- **TelephoneNumbers:** `Id` (GUID), `ContactId` (GUID, FK), `Type`, `PhoneNumber`, `Description`.
+- Vazba **Contacts 1:N TelephoneNumbers**; při smazání kontaktu se jeho telefony odstraní kaskádově.
+- Typ telefonu: `mobile`, `landline`, `fax`, `work`, `other`.
 
-Mezi tabulkami bude vztah **1:N**: jeden kontakt může mít více telefonních čísel; každé telefonní číslo náleží právě jednomu kontaktu. Vazba bude realizována cizím klíčem `TelephoneNumbers.ContactId` na `Contacts.Id`.
+Detail kontaktu umožní spravovat libovolný počet telefonů v subgridu. Aktuální `server.js` je starý prototyp s jednou tabulkou a číselným ID; **není implementací schváleného modelu**.
 
-Každý záznam `TelephoneNumbers` bude obsahovat:
-- `Id` — primární klíč,
-- `ContactId` — cizí klíč na kontakt,
-- `Type` — **option set** (výběr z předdefinovaných typů telefonu): **mobil, pevná linka, fax, pracovní, jiný**,
-- `PhoneNumber` — textové pole pro zadání telefonního čísla (aby se zachovalo `+`, úvodní nuly a formátování).
+## REST API v1 — schválený kontrakt
 
-```text
-Contacts (1)
-  Id
-  FirstName
-  LastName
-    │
-    └── (N) TelephoneNumbers
-              Id
-              ContactId → Contacts.Id
-              Type
-              PhoneNumber
-```
+Jediným závazným kontraktem je [API.md](docs/API.md). Obsahuje **pět CRUD operací pro každou entitu** (celkem 10 endpointů):
 
-**Uživatelské rozhraní:** Přehled kontaktů a pohodlný editační formulář kontaktu. V detailu kontaktu bude možné přímo zobrazovat, přidávat, upravovat a odebírat libovolný počet telefonních čísel. U každého čísla bude výběrové pole pro typ telefonu a vstupní pole pro samotné číslo. Ovládání má být přehledné a umožňovat editaci kontaktu i jeho telefonních čísel bez zbytečného přecházení mezi stránkami.
-
-Dosavadní demonstrační implementace eviduje jméno, příjmení a jedno telefonní číslo; výše uvedený model a editor představují **požadovaný cílový stav**, nikoli potvrzení, že už jsou implementovány.
-
-## REST API v1 — návrh kontraktu
-
-Základní adresa: `http://localhost:3000/api`. Komunikace probíhá přes HTTP s JSON těly požadavků a odpovědí (`Content-Type: application/json`). Identifikátory jsou v URL; pro vytvoření nového záznamu je přiděluje server.
-
-### Kontakty (Contacts)
-
-| Metoda | Endpoint | Význam |
+| Operace | Contacts | TelephoneNumbers |
 | --- | --- | --- |
-| `GET` | `/api/contacts` | Seznam kontaktů |
-| `POST` | `/api/contacts` | Založení kontaktu |
-| `PUT` | `/api/contacts/:id` | Úprava kontaktu |
-| `DELETE` | `/api/contacts/:id` | Smazání kontaktu |
+| Seznam | `GET /api/contacts` | `GET /api/telephones` |
+| Detail | `GET /api/contacts/{id}` | `GET /api/telephones/{id}` |
+| Vytvoření | `POST /api/contacts` | `POST /api/telephones` |
+| Aktualizace | `PUT /api/contacts/{id}` | `PUT /api/telephones/{id}` |
+| Smazání | `DELETE /api/contacts/{id}` | `DELETE /api/telephones/{id}` |
 
-Příklad těla pro `POST` a `PUT`:
-
-```json
-{
-  "firstName": "Jan",
-  "lastName": "Novák"
-}
-```
-
-### Telefonní čísla (TelephoneNumbers)
-
-| Metoda | Endpoint | Význam |
-| --- | --- | --- |
-| `GET` | `/api/contacts/:contactId/telephone-numbers` | Seznam telefonních čísel daného kontaktu |
-| `POST` | `/api/contacts/:contactId/telephone-numbers` | Přidání telefonního čísla ke kontaktu |
-| `PUT` | `/api/contacts/:contactId/telephone-numbers/:phoneId` | Úprava konkrétního telefonního čísla |
-| `DELETE` | `/api/contacts/:contactId/telephone-numbers/:phoneId` | Smazání konkrétního telefonního čísla |
-
-Příklad těla pro `POST` a `PUT`:
-
-```json
-{
-  "type": "mobile",
-  "phoneNumber": "+420 777 123 456"
-}
-```
-
-`type` je option set s povolenými hodnotami `mobile` (mobil), `landline` (pevná linka), `fax`, `work` (pracovní), `other` (jiný). `phoneNumber` je textový řetězec. `contactId` se bere z URL a nelze jej měnit tělem požadavku.
-
-### Pravidla API
-
-- `GET` vrací `200 OK` a JSON pole; prázdný seznam je `[]`.
-- `POST` při úspěchu vrací `201 Created`, JSON nového záznamu včetně ID a hlavičku `Location`.
-- `PUT` při úspěchu vrací `200 OK` s upraveným záznamem. `PUT` představuje úplnou aktualizaci editovatelných polí.
-- `DELETE` při úspěchu vrací `204 No Content`.
-- Neexistující kontakt nebo telefonní číslo: `404 Not Found`; chybné vstupy či nepovolený typ: `400 Bad Request`.
-- Úprava a smazání telefonního čísla musí ověřit, že `phoneId` skutečně patří ke kontaktu `contactId`.
-- Při odstranění kontaktu se odstraní i všechna jeho telefonní čísla; databázová vazba bude mít `ON DELETE CASCADE` a aktivní SQLite foreign keys (`PRAGMA foreign_keys = ON`).
-- REST vrstva pouze validuje a obsluhuje HTTP; databázové operace provádí oddělená provider/repository vrstva.
-
-**Stav:** Jde o cílový návrh kontraktu. Není tím potvrzeno, že jsou všechny endpointy již implementovány.
+Pro subgrid: `GET /api/telephones?contactId={guid}`. Všechny identifikátory jsou GUID řetězce; `id` vytváří backend. Staré vnořené endpointy `/api/contacts/{contactId}/telephone-numbers` se **nepoužívají**. Backend Node.js je první implementace; ASP.NET Core a PHP mají později implementovat totožný kontrakt.
 
 ## Uživatelské rozhraní — cílová specifikace
 
@@ -180,7 +118,7 @@ Frontend bude tvořen statickým HTML souborem (aplikační shell), CSS a JavaSc
 
 ### Formulář detailu kontaktu
 
-- Detail kontaktu bude editovatelný formulář s poli **jméno**, **příjmení** a výhledově dalšími poli (např. **poznámky**); rozšíření datového modelu o tato pole se upřesní později.
+- Detail kontaktu bude editovatelný formulář s poli **jméno**, **příjmení**, **adresu** a **popis** podle schváleného datového modelu.
 - Formulář bude podporovat uložení změn a zrušení editace.
 - Pod hlavní částí formuláře bude **subgrid telefonních čísel** navázaný vztahem Contacts 1:N TelephoneNumbers.
 - Subgrid bude načítat pouze telefony otevřeného kontaktu.
@@ -190,7 +128,7 @@ Frontend bude tvořen statickým HTML souborem (aplikační shell), CSS a JavaSc
 
 - Kliknutí na **+** otevře formulář nového telefonu.
 - Kliknutí na existující řádek v subgridu otevře tentýž formulář s předvyplněnými údaji.
-- Formulář obsahuje **Type** jako option set (mobil, pevná linka, fax, pracovní, jiný) a **PhoneNumber** jako textový vstup.
+- Formulář obsahuje **Type** jako option set (mobil, pevná linka, fax, pracovní, jiný), **PhoneNumber** jako textový vstup a **Description** jako víceřádkový popis.
 - Akce **Uložit** provede vytvoření nebo změnu přes REST API; **Zrušit** zavře formulář bez uložení.
 - Vazba na nadřazený kontakt se předává z kontextu detailu kontaktu, nikoli jako volně editovatelné pole.
 
@@ -249,11 +187,11 @@ Metadatové definice musí podporovat minimálně:
 2. **Entity a data source/provider** — logický název entity, REST endpoint, metody GET/POST/PUT/DELETE, identifikační pole a mapování datových polí na JSON vlastnosti API.
 3. **Grid (view)** — sloupce, popisky, pořadí, zdroj dat, akce pro nový záznam / otevření / smazání.
 4. **Formulář (form)** — sekce, pořadí a typy polí, popisky, editovatelnost, povinná pole, tlačítka Uložit / Zrušit a mapování na API.
-5. **Subgrid / vztah** — nadřazená a podřízená entita, vztah 1:N, vazební pole `ContactId`, endpoint závislý na ID otevřeného kontaktu.
+5. **Subgrid / vztah** — nadřazená a podřízená entita, vztah 1:N, vazební pole `ContactId`, seznamový endpoint `GET /api/telephones?contactId={guid}`.
 6. **Option set** — stabilní hodnoty a zobrazované popisky (např. `mobile` → Mobil).
 7. **Dialogy a akce** — konfigurovatelné potvrzení mazání a vazba akcí na příslušné REST operace.
 
-Příklad **ilustrativního návrhu** metadat (finální JSON schéma se ještě upřesní):
+Příklad **ilustrativního návrhu** metadat (finální JSON schéma rendereru se ještě musí schválit):
 
 ```json
 {
@@ -262,90 +200,69 @@ Příklad **ilustrativního návrhu** metadat (finální JSON schéma se ještě
       "idField": "id",
       "provider": {
         "list": { "method": "GET", "url": "/api/contacts" },
+        "get": { "method": "GET", "url": "/api/contacts/{id}" },
         "create": { "method": "POST", "url": "/api/contacts" },
         "update": { "method": "PUT", "url": "/api/contacts/{id}" },
         "delete": { "method": "DELETE", "url": "/api/contacts/{id}" }
       },
       "fields": {
-        "firstName": { "type": "text", "label": "Jméno" },
-        "lastName": { "type": "text", "label": "Příjmení" }
+        "firstName": { "type": "text", "label": "Jméno", "required": true },
+        "lastName": { "type": "text", "label": "Příjmení", "required": true },
+        "address": { "type": "textarea", "label": "Adresa" },
+        "description": { "type": "textarea", "label": "Popis" }
       },
       "views": {
-        "main": {
-          "type": "grid",
-          "columns": ["firstName", "lastName"],
-          "openForm": "detail",
-          "allowCreate": true,
-          "allowDelete": true
-        }
+        "main": { "type": "grid", "columns": ["firstName", "lastName"], "openForm": "detail", "allowCreate": true, "allowDelete": true }
       },
       "forms": {
         "detail": {
-          "fields": ["firstName", "lastName"],
-          "subgrids": [
-            {
-              "entity": "telephoneNumber",
-              "relationField": "contactId",
-              "parentIdField": "id",
-              "view": "byContact"
-            }
-          ]
+          "fields": ["firstName", "lastName", "address", "description"],
+          "subgrids": [{ "entity": "telephoneNumber", "relationField": "contactId", "parentIdField": "id", "view": "byContact" }],
+          "actions": ["save", "cancel"]
         }
       }
     },
     "telephoneNumber": {
       "idField": "id",
       "provider": {
-        "list": { "method": "GET", "url": "/api/contacts/{contactId}/telephone-numbers" },
-        "create": { "method": "POST", "url": "/api/contacts/{contactId}/telephone-numbers" },
-        "update": { "method": "PUT", "url": "/api/contacts/{contactId}/telephone-numbers/{id}" },
-        "delete": { "method": "DELETE", "url": "/api/contacts/{contactId}/telephone-numbers/{id}" }
+        "list": { "method": "GET", "url": "/api/telephones" },
+        "get": { "method": "GET", "url": "/api/telephones/{id}" },
+        "create": { "method": "POST", "url": "/api/telephones" },
+        "update": { "method": "PUT", "url": "/api/telephones/{id}" },
+        "delete": { "method": "DELETE", "url": "/api/telephones/{id}" }
       },
+      "filter": { "contactId": "{parent.id}" },
       "fields": {
         "type": {
           "type": "optionset",
           "label": "Typ telefonu",
+          "required": true,
           "options": [
             { "value": "mobile", "label": "Mobil" },
             { "value": "landline", "label": "Pevná linka" },
             { "value": "fax", "label": "Fax" },
-            { "value": "work", "label": "Pracovní" },
+            { "value": "work", "label": "Telefon do práce" },
             { "value": "other", "label": "Jiný" }
           ]
         },
-        "phoneNumber": { "type": "text", "label": "Telefonní číslo" }
+        "phoneNumber": { "type": "text", "label": "Telefonní číslo", "required": true },
+        "description": { "type": "textarea", "label": "Popis" }
       },
       "views": {
-        "byContact": {
-          "type": "grid",
-          "columns": ["type", "phoneNumber"],
-          "openForm": "detail",
-          "allowCreate": true,
-          "allowDelete": true
-        }
+        "byContact": { "type": "grid", "columns": ["type", "phoneNumber", "description"], "openForm": "detail", "allowCreate": true, "allowDelete": true }
       },
       "forms": {
-        "detail": {
-          "fields": ["type", "phoneNumber"],
-          "actions": ["save", "cancel"]
-        }
+        "detail": { "fields": ["type", "phoneNumber", "description"], "actions": ["save", "cancel"] }
       }
     }
   },
   "navigation": [{ "label": "Kontakty", "entity": "contact", "view": "main" }],
-  "dashboard": {
-    "tiles": [{ "label": "Moje kontakty", "entity": "contact", "view": "main" }]
-  },
-  "dialogs": {
-    "confirmDelete": {
-      "type": "modal",
-      "buttons": ["yes", "no"]
-    }
-  }
+  "dashboard": { "tiles": [{ "label": "Moje kontakty", "entity": "contact", "view": "main" }] },
+  "dialogs": { "confirmDelete": { "type": "modal", "buttons": ["yes", "no"] } }
 }
 ```
 
-**Poznámka k rozsahu:** Jde o požadovanou cílovou architekturu a příklad metadat, nikoli o hotový renderer. Konkrétní názvy souborů, JSON schéma, komponenty a případná další pole kontaktu se mohou upřesnit při implementaci.
+**Důležité:** Ukázka ilustruje aktuální pole a API, ale konkrétní schema, vazby, validace a chování univerzálního rendereru zatím **nejsou finálně uzavřeny**.
 
 ## Spuštění na Windows
 
@@ -380,6 +297,15 @@ První fázi projektu vyvíjí **jeden univerzální AI agent**, bez multiagentn
 
 Historické instrukce v `agents/*.md` nejsou aktivní. Jeden agent řeší databázi, REST API, metadata-driven frontend i testování postupně. Závazné kontrakty jsou `docs/DATOVY_MODEL.md` a `docs/API.md`. Binární dokumentace se ukládá na Google Drive do `Context Demo/Dokumentace/Návrh`.
 
+## Dokumentace, historie a vizuální návrh
+
+- [Datový model](docs/DATOVY_MODEL.md) — závazný popis entit, GUID a vztahů.
+- [REST API](docs/API.md) — závazný popis všech 10 CRUD operací.
+- [Architektura](docs/ARCHITECTURE.md) — technologické vrstvy, lokální provoz a plánované portace.
+- [AGENTS.md](AGENTS.md) — instrukce pro jediného vývojového agenta.
+- [HISTORIE.md](HISTORIE.md) — průběžný záznam konverzace, nikoliv specifikace; starší úseky mohou být neúplné.
+- [Vizuální návrh na Google Drive](https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view) — uložený v `Context Demo/Dokumentace/Návrh`. Název složky Drive se liší od názvu aplikace `Contacts Demo`; jde o aktuální existující umístění.
+
 ## Bezpečnost a stav
 
-Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je připravený k experimentu; agenti zatím nebyli skutečně spuštěni. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
+Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je ve fázi finalizace zadání; jednoagentní vývoj podle nových kontraktů zatím nebyl proveden. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
