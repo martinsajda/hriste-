@@ -1,0 +1,398 @@
+{
+  "$schema": "../schemas/grid.schema.json",
+  "schemaVersion": 2,
+  "id": "telephones-grid",
+  "type": "grid",
+  "entity": "telephone",
+  "dataSource": {
+    "type": "rest",
+    "endpoint": "/api/telephones",
+    "method": "GET",
+    "response": {
+      "idField": "id"
+    },
+    "advancedSearch": {
+      "enabled": false,
+      "endpoint": "/api/telephones/search",
+      "method": "POST",
+      "requestMode": "structured",
+      "response": {
+        "itemsPath": "items",
+        "pagePath": "pagination.page",
+        "pageSizePath": "pagination.pageSize",
+        "totalItemsPath": "pagination.totalItems",
+        "totalPagesPath": "pagination.totalPages"
+      }
+    }
+  },
+  "columns": [
+    {
+      "field": "type",
+      "dataType": "enum",
+      "labels": {
+        "1029": "Typ",
+        "1031": "Typ",
+        "1033": "Type"
+      },
+      "visible": true,
+      "width": 160,
+      "minWidth": 100,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": true,
+      "filterable": true,
+      "filter": {
+        "type": "select",
+        "defaultOperator": "in"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true,
+        "style": "enum",
+        "enumLabels": {
+          "mobile": {
+            "1029": "Mobil",
+            "1031": "Mobil",
+            "1033": "Mobile"
+          },
+          "landline": {
+            "1029": "Pevná linka",
+            "1031": "Festnetz",
+            "1033": "Landline"
+          },
+          "fax": {
+            "1029": "Fax",
+            "1031": "Fax",
+            "1033": "Fax"
+          },
+          "work": {
+            "1029": "Pracovní",
+            "1031": "Arbeit",
+            "1033": "Work"
+          },
+          "other": {
+            "1029": "Jiné",
+            "1031": "Andere",
+            "1033": "Other"
+          }
+        }
+      }
+    },
+    {
+      "field": "phoneNumber",
+      "dataType": "string",
+      "labels": {
+        "1029": "Telefonní číslo",
+        "1031": "Telefonnummer",
+        "1033": "Phone number"
+      },
+      "visible": true,
+      "width": 190,
+      "minWidth": 100,
+      "maxWidth": 500,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": true,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    },
+    {
+      "field": "description",
+      "dataType": "string",
+      "labels": {
+        "1029": "Popis",
+        "1031": "Beschreibung",
+        "1033": "Description"
+      },
+      "visible": true,
+      "width": 300,
+      "minWidth": 100,
+      "resizable": true,
+      "reorderable": true,
+      "hideable": true,
+      "pinning": {
+        "enabled": true,
+        "default": "none"
+      },
+      "sortable": false,
+      "filterable": true,
+      "filter": {
+        "type": "text",
+        "defaultOperator": "contains"
+      },
+      "format": {
+        "align": "left",
+        "overflow": "ellipsis",
+        "tooltip": true
+      }
+    }
+  ],
+  "sorting": {
+    "enabled": true,
+    "default": [
+      {
+        "field": "type",
+        "direction": "asc"
+      }
+    ]
+  },
+  "pagination": {
+    "enabled": true,
+    "mode": "client",
+    "defaultPageSize": 20,
+    "pageSizeOptions": [
+      10,
+      20,
+      50,
+      100
+    ],
+    "showTotalCount": true
+  },
+  "filtering": {
+    "enabled": true,
+    "display": "columnHeader",
+    "combine": "and",
+    "defaultOperator": "contains",
+    "caseSensitive": false,
+    "globalSearch": {
+      "enabled": true,
+      "fields": [
+        "phoneNumber",
+        "description"
+      ],
+      "operator": "contains",
+      "debounceMs": 350,
+      "minLength": 2
+    },
+    "operators": {
+      "string": [
+        "contains",
+        "equals",
+        "startsWith",
+        "endsWith",
+        "isEmpty"
+      ],
+      "integer": [
+        "equals",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "between",
+        "isEmpty"
+      ],
+      "decimal": [
+        "equals",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "between",
+        "isEmpty"
+      ],
+      "date": [
+        "equals",
+        "before",
+        "after",
+        "between",
+        "isEmpty"
+      ],
+      "datetime": [
+        "equals",
+        "before",
+        "after",
+        "between",
+        "isEmpty"
+      ],
+      "boolean": [
+        "equals",
+        "isEmpty"
+      ],
+      "enum": [
+        "in",
+        "notIn",
+        "isEmpty"
+      ]
+    }
+  },
+  "selection": {
+    "mode": "multiple",
+    "showCheckboxes": true,
+    "selectAllScope": "currentPage"
+  },
+  "recordOpening": {
+    "enabled": false
+  },
+  "actions": [
+    {
+      "id": "create",
+      "handler": "openForm",
+      "target": {
+        "entity": "telephone",
+        "form": "detail",
+        "mode": "create"
+      },
+      "labels": {
+        "1029": "Nové číslo",
+        "1031": "Neue Nummer",
+        "1033": "New number"
+      },
+      "icon": "plus",
+      "selection": "none"
+    },
+    {
+      "id": "open",
+      "handler": "openForm",
+      "target": {
+        "entity": "telephone",
+        "form": "detail",
+        "mode": "edit"
+      },
+      "labels": {
+        "1029": "Otevřít",
+        "1031": "Öffnen",
+        "1033": "Open"
+      },
+      "icon": "external-link",
+      "selection": "single"
+    },
+    {
+      "id": "delete",
+      "handler": "deleteRecords",
+      "selection": "oneOrMore",
+      "confirmation": {
+        "required": true,
+        "messageKey": "confirmDelete"
+      },
+      "labels": {
+        "1029": "Odstranit",
+        "1031": "Löschen",
+        "1033": "Delete"
+      },
+      "icon": "trash-2"
+    },
+    {
+      "id": "refresh",
+      "handler": "refreshGrid",
+      "selection": "any",
+      "labels": {
+        "1029": "Obnovit",
+        "1031": "Aktualisieren",
+        "1033": "Refresh"
+      },
+      "icon": "refresh-cw"
+    },
+    {
+      "id": "export",
+      "handler": "exportGrid",
+      "selection": "any",
+      "labels": {
+        "1029": "Exportovat",
+        "1031": "Exportieren",
+        "1033": "Export"
+      },
+      "icon": "download"
+    }
+  ],
+  "toolbar": {
+    "enabled": true,
+    "actions": [
+      "create",
+      "delete",
+      "refresh",
+      "export"
+    ]
+  },
+  "contextMenu": {
+    "enabled": true,
+    "actions": [
+      "open",
+      "delete"
+    ]
+  },
+  "views": {
+    "enabled": true,
+    "defaultViewId": "default",
+    "allowCreate": true,
+    "allowRename": true,
+    "allowDelete": true,
+    "allowSetDefault": true,
+    "persistence": {
+      "provider": "localStorage",
+      "key": "telephones-grid.views",
+      "scope": "user"
+    },
+    "save": {
+      "columnOrder": true,
+      "columnVisibility": true,
+      "columnWidths": true,
+      "columnPinning": true,
+      "sorting": true,
+      "filters": true,
+      "pageSize": true
+    }
+  },
+  "export": {
+    "enabled": true,
+    "formats": [
+      "csv",
+      "xlsx"
+    ],
+    "defaultFormat": "xlsx",
+    "scopes": [
+      "currentPage",
+      "filtered",
+      "selected"
+    ],
+    "defaultScope": "filtered",
+    "columns": "visible",
+    "respectColumnOrder": true,
+    "respectSorting": true,
+    "useLocalizedHeaders": true,
+    "csv": {
+      "delimiter": ";",
+      "encoding": "utf-8",
+      "includeBom": true
+    },
+    "xlsx": {
+      "sheetName": "Telephones",
+      "freezeHeader": true,
+      "autoFilter": true
+    }
+  },
+  "localization": {
+    "labels": {
+      "1029": {
+        "title": "Telefonní čísla",
+        "confirmDelete": "Opravdu odstranit vybraná čísla?"
+      },
+      "1031": {
+        "title": "Telefonnummern",
+        "confirmDelete": "Ausgewählte Telefonnummern löschen?"
+      },
+      "1033": {
+        "title": "Telephone numbers",
+        "confirmDelete": "Delete selected phone numbers?"
+      }
+    }
+  }
+}
