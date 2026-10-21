@@ -295,6 +295,8 @@ Formátování hodnot, další akce a detailní chování výběru řádků. Nei
 
 **Stav:** schválený návrh metadat; renderer, REST POST vyhledávání, export ani ukládání pohledů zatím nejsou implementovány. Předchozí v1 výše zůstává referencí zpětné kompatibility. V2 je preferovaná specifikace pro novou implementaci.
 
+**Samostatné zdrojové soubory pro revizi:** [`metadata/contacts.grid.json`](../metadata/contacts.grid.json) (platný JSON), [`metadata/contacts.grid.jsonc`](../metadata/contacts.grid.jsonc) (komentovaný příklad), [`metadata/telephones.grid.json`](../metadata/telephones.grid.json) (druhý příklad). Formální pravidla jsou v [`schemas/grid.schema.json`](../schemas/grid.schema.json), [`schemas/grid-column.schema.json`](../schemas/grid-column.schema.json) a [`schemas/grid-view.schema.json`](../schemas/grid-view.schema.json). Níže uvedený JSON je dokumentační snímek; při změnách je nutné udržovat soulad se samostatnými soubory.
+
 ## Kompletní referenční JSON v2 (grid kontaktů)
 
 ```json
