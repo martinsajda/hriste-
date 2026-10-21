@@ -286,3 +286,5 @@ Při dalších změnách projektu se na konec souboru připojují další **uži
 > Tak zkusme to ještě jednou.
 
 **Výsledek:** Opakovaný zápis pravidel do `docs/ARCHITECTURE.md` tentokrát uspěl. Commit `9083ccc7ebb3bcbebac6ab84d1fbd5c814f5f70d` na výchozí větvi.
+
+Ověřeno, potvrzeno.
