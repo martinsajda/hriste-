@@ -234,7 +234,7 @@ Jeden agent řeší databázi, REST API, metadata-driven frontend i testování 
 - [DEPLOY.md](DEPLOY.md) — budoucí automatizované nahrávání na PHP webhosting přes FTP/FTPS/SFTP.
 - [AGENTS.md](AGENTS.md) — instrukce pro jediného vývojového agenta.
 - [HISTORIE.md](HISTORIE.md) — průběžný záznam konverzace, nikoliv specifikace; starší úseky mohou být neúplné.
-- [Vizuální návrh na Google Drive](https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view) — uložený v `Context Demo/Dokumentace/Návrh`. Název složky Drive se liší od názvu aplikace `Contacts Demo`; jde o aktuální existující umístění.
+- [Vizuální návrh na Google Drive](https://drive.google.com/file/d/1FvGysQqN-sKrESdDGvFKG7z_yl88OXBp/view) — uložený v `Context Demo/Dokumentace/Návrh`. PNG vizuálního návrhu zůstává **pouze na Google Drive** a nebude se commitovat ani pushovat do GitHubu.
 
 ## Bezpečnost a stav
 
