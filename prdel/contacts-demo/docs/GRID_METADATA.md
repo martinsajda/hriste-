@@ -5,12 +5,12 @@
 ## Principy
 
 - Jeden univerzální grid, dvě strategie načítání dat: `pagination.mode = "client"` a `"server"`.
-- JSON definuje datový zdroj, sloupce, nadpisy, výchozí vícesloupcové řazení, stránkování a výběr řádků.
+- JSON definuje datový zdroj, sloupce, nadpisy, výchozí vícesloupcové řazení, stránkování, výběr řádků a filtrování jednotlivých sloupců operátorem `contains`.
 - Vzhled je řízen centrálním CSS; metadata neobsahují inline styly.
 - Klientský režim načte celé pole a řadí, filtruje a stránkuje lokálně.
 - Serverový režim při změně stránky, velikosti stránky či řazení opakuje GET požadavek. Server provádí řazení, filtrování a stránkování nad celým datasetem **před** odesláním stránky.
 - Parametry REST požadavku a cesty v odpovědi jsou mapovatelné v metadatech.
-- Jde o základní schéma v1; pokročilé vlastnosti sloupců, formátování, akce a syntaxe obecných filtrů budou předmětem další iterace.
+- Jde o základní schéma v1; pokročilé vlastnosti sloupců, formátování, akce a jiné typy filtrů budou předmětem další iterace.
 
 ## Referenční JSON — klientský grid kontaktů
 
@@ -27,10 +27,10 @@
     "response": { "idField": "id" }
   },
   "columns": [
-    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true },
-    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true },
-    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true },
-    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false }
+    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true },
+    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true },
+    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true },
+    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true }
   ],
   "sorting": {
     "enabled": true,
@@ -46,7 +46,7 @@
     "pageSizeOptions": [10, 20, 50, 100],
     "showTotalCount": true
   },
-  "selection": { "mode": "multiple", "showCheckboxes": true }
+  "filtering": {\n    "enabled": true,\n    "display": "columnHeader",\n    "defaultOperator": "contains",\n    "caseSensitive": false,\n    "combine": "and"\n  },\n  "selection": { "mode": "multiple", "showCheckboxes": true }
 }
 ```
 
@@ -64,7 +64,7 @@ Ostatní části gridu zůstávají stejné.
   "request": {
     "pageParam": "page",
     "pageSizeParam": "pageSize",
-    "sortParam": "sort"
+    "sortParam": "sort",\n    "filterParamPrefix": "filter"
   },
   "response": {
     "itemsPath": "items",
@@ -87,9 +87,24 @@ Tento kontrakt rozšiřuje existující `GET /api/contacts` a `GET /api/telephon
 - Při shodě řadicích hodnot server použije `id` jako poslední stabilizační klíč (pokud již není uveden).
 - `totalItems` znamená počet záznamů po aplikaci filtru a před stránkováním; `totalPages` je počet stránek při dané velikosti (u prázdného výsledku 0).
 - Serverové stránkování telefonního subgridu kombinuje `contactId` se stránkovacími parametry: `GET /api/telephones?contactId={guid}&page=1&pageSize=20&sort=type:asc`.
-- Obecná syntaxe `filter` zatím **není schválena**. Schválen je pouze existující filtr `contactId`.
+- Schválené sloupcové filtry používají opakované query parametry `filter[field]=text` (v URL procentově kódované). Každý parametr znamená `contains` nad daným textovým polem, bez rozlišení velikosti písmen. Více různých polí se kombinuje pomocí AND. Prázdný nebo pouze mezerový text se ignoruje; hodnoty se před porovnáním oříznou o krajní mezery. Null hodnota neodpovídá neprázdnému filtru. Server povolí pouze známá filtrovatelná pole, jinak vrací HTTP 400. Duplicitní filtr stejného pole je neplatný (400).
+- Klientský i serverový režim aplikují stejné filtry nad celou množinou dat **před** stránkováním; při změně filtru se aktuální stránka resetuje na 1. Počet `totalItems` již zohledňuje filtr. Řazení probíhá po filtrování a před stránkováním.
+- Filtr `contactId` telefonního subgridu je samostatný přesný vztahový filtr a kombinuje se s fulltextovými sloupcovými filtry pomocí AND. Jiné operátory a obecná syntaxe výrazů zatím nejsou součástí v1.
 - V klientském režimu se nepoužívají serverové stránkovací parametry a odpověď zůstává polem.
 - Serverový režim musí respektovat výchozí řazení gridu již při prvním načtení; renderer serializuje pole `sorting.default` do parametru `sort`.
+
+## Fulltextové filtry sloupců — metadata a REST
+
+- Sloupec s `filterable: true` má textový vstup v záhlaví (`filtering.display: "columnHeader"`); s `false` nemá filtr.
+- `filtering.defaultOperator: "contains"` znamená hledání podřetězce kdekoliv v hodnotě, nikoliv jen na začátku. `caseSensitive: false` vypíná rozlišení velikosti písmen. Pro české texty musí klient i server použít ekvivalentní Unicode porovnávání bez ohledu na velikost písmen; odstranění diakritiky **není** součástí kontraktu.
+- `filtering.combine: "and"` vyžaduje splnění všech neprázdných sloupcových filtrů.
+- Příklad serverového požadavku (hranaté závorky se při odeslání URL kódují):
+
+```http
+GET /api/contacts?page=1&pageSize=20&sort=lastName:asc&filter[firstName]=jan&filter[address]=Brno
+```
+
+- API kontrakt v1: `filter[field]=text` pro filtrovatelná textová pole; platí i bez stránkovacích parametrů, kdy API vrací běžné JSON pole.
 
 ## Příklad stránkovaného požadavku a odpovědi
 
