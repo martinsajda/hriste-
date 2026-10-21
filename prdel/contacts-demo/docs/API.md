@@ -98,7 +98,11 @@ Prázdný seznam vrací `200 OK` a `[]`. Příklad jednotného formátu chyby:
 - Smazání kontaktu kaskádově smaže všechny jeho telefony (`ON DELETE CASCADE`).
 - Identifikátory se nikdy negenerují jako číselné auto-increment hodnoty.
 - `PUT` aktualizuje kompletní sadu editovatelných polí, `PATCH` není součástí v1.
-- Autentizace, stránkování, pokročilé filtrování a vyhledávání nejsou součástí minimálního kontraktu v1.
+- Autentizace, obecné pokročilé filtrování a vyhledávání nejsou součástí minimálního kontraktu v1. **Volitelné stránkování a řazení seznamových GET endpointů je schváleným rozšířením** podle [GRID_METADATA.md](GRID_METADATA.md).
+
+## Volitelné stránkování a řazení seznamů — schválené rozšíření
+
+Seznamové endpointy podporují volitelné parametry `page`, `pageSize` a `sort`. Bez stránkovacích parametrů zůstává odpovědí JSON pole; při společném zadání `page` a `pageSize` je odpovědí objekt s `items` a `pagination` (`page`, `pageSize`, `totalItems`, `totalPages`). Syntaxe `sort` je `field:asc,otherField:desc`; `page` začíná na 1, `pageSize` je nejvýše 100. Neplatné parametry vracejí HTTP 400. Pro telefony zůstává použitelný filtr `contactId`, také společně se stránkováním. Detailní pravidla a JSON příklady jsou závazně popsány v [GRID_METADATA.md](GRID_METADATA.md).
 
 ## Implementační nezávislost
 
