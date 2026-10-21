@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contacts-demo/schemas/grid-column.schema.json",
+  "title": "Grid column metadata v2",
+  "description": "Definice jediného sloupce univerzálního gridu; hodnoty default jsou anotace, které musí renderer sám aplikovat.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "field",
+    "dataType",
+    "labels"
+  ],
+  "properties": {
+    "field": {
+      "type": "string",
+      "description": "Technický název pole v REST JSON.",
+      "minLength": 1
+    },
+    "dataType": {
+      "type": "string",
+      "description": "Datový typ pro vykreslení, řazení a filtrování.",
+      "enum": [
+        "string",
+        "integer",
+        "decimal",
+        "boolean",
+        "date",
+        "datetime",
+        "enum",
+        "guid"
+      ]
+    },
+    "labels": {
+      "type": "object",
+      "description": "Překlady podle číselného LCID z app.config.json; klíče jsou řetězce.",
+      "propertyNames": {
+        "pattern": "^[0-9]+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1
+    },
+    "visible": {
+      "type": "boolean",
+      "description": "Počáteční viditelnost sloupce.",
+      "default": true
+    },
+    "width": {
+      "description": "Počáteční šířka v CSS px nebo auto.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "const": "auto"
+        }
+      ],
+      "default": "auto"
+    },
+    "minWidth": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Minimální šířka v CSS px."
+    },
+    "maxWidth": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximální šířka v CSS px."
+    },
+    "resizable": {
+      "type": "boolean",
+      "description": "Lze měnit šířku tažením hranice záhlaví.",
+      "default": false
+    },
+    "reorderable": {
+      "type": "boolean",
+      "description": "Lze změnit pořadí sloupce.",
+      "default": false
+    },
+    "hideable": {
+      "type": "boolean",
+      "description": "Lze uživatelsky skrýt sloupec.",
+      "default": false
+    },
+    "pinning": {
+      "type": "object",
+      "description": "Připnutí sloupce.",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "default"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Umožní připnutí."
+        },
+        "default": {
+          "type": "string",
+          "description": "Výchozí strana připnutí.",
+          "enum": [
+            "none",
+            "left",
+            "right"
+          ]
+        }
+      }
+    },
+    "sortable": {
+      "type": "boolean",
+      "description": "Povolit řazení.",
+      "default": false
+    },
+    "filterable": {
+      "type": "boolean",
+      "description": "Povolit filtrování.",
+      "default": false
+    },
+    "filter": {
+      "type": "object",
+      "description": "UI a operátor filtru.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Typ filtračního ovládání.",
+          "enum": [
+            "text",
+            "number",
+            "date",
+            "datetime",
+            "boolean",
+            "select"
+          ]
+        },
+        "defaultOperator": {
+          "type": "string",
+          "description": "Výchozí operátor.",
+          "enum": [
+            "contains",
+            "equals",
+            "startsWith",
+            "endsWith",
+            "isEmpty",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "between",
+            "before",
+            "after",
+            "in",
+            "notIn"
+          ]
+        }
+      }
+    },
+    "format": {
+      "type": "object",
+      "description": "Prezentace hodnot; bez změny dat.",
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "type": "string",
+          "description": "Zarovnání.",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "overflow": {
+          "type": "string",
+          "description": "Přetečení obsahu.",
+          "enum": [
+            "ellipsis",
+            "wrap",
+            "clip"
+          ]
+        },
+        "tooltip": {
+          "type": "boolean",
+          "description": "Zobrazit bezpečný tooltip."
+        },
+        "style": {
+          "type": "string",
+          "description": "Formátovací styl.",
+          "enum": [
+            "currency",
+            "number",
+            "date",
+            "datetime",
+            "percent",
+            "enum"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 kód měny.",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Počet desetinných míst."
+        },
+        "enumLabels": {
+          "type": "object",
+          "description": "Kód enum hodnoty -> LCID -> popisek.",
+          "additionalProperties": {
+            "type": "object",
+            "description": "Překlady podle číselného LCID z app.config.json; klíče jsou řetězce.",
+            "propertyNames": {
+              "pattern": "^[0-9]+$"
+            },
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minProperties": 1
+          }
+        },
+        "variant": {
+          "type": "string",
+          "description": "Předdefinovaný vizuální styl.",
+          "enum": [
+            "default",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        }
+      }
+    }
+  }
+}
