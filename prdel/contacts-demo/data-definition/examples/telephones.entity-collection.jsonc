@@ -2,11 +2,14 @@
 // Obycejna data jsou nativni JSON typy; zadne obalky {type,value}.
 // Typ telefonu je stabilni string kod z optionSetu; label se vezme podle LCID.
 {
+  // Logicky nazev entity.
   "entityName": "telephone",
+  // Pole Entity zaznamu.
   "entities": [
     {
       "logicalName": "telephone",
       "id": "c83eb3ae-a19b-4eb8-9675-19a67f8390c3",
+      // contactId nese EntityReference; type je invariantni optionSet kod.
       "attributes": {
         "id": "c83eb3ae-a19b-4eb8-9675-19a67f8390c3",
         "contactId": {
@@ -20,6 +23,7 @@
       }
     }
   ],
+  // Strankovani cele kolekce.
   "paging": {
     "page": 1,
     "pageSize": 20,
