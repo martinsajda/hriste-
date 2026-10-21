@@ -12,8 +12,9 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 2. `docs/DATOVY_MODEL.md` — závazné schéma dvou entit, GUID a vztah 1:N.
 3. `docs/API.md` — závazný REST API v1 kontrakt: 5 CRUD operací na entitu, celkem 10, a schválené volitelné stránkování seznamů.
 4. `docs/GRID_METADATA.md` — schválená metadata gridů, klientské a serverové stránkování.
-5. `docs/ARCHITECTURE.md` — závazné technologické vrstvy a provoz.
-6. `DEPLOY.md` — odsouhlasený směr budoucího veřejného nasazení (bez dosud určených detailů).
+5. `app.config.json` — jediný zdroj výchozího LCID a podporovaných jazyků pro všechny gridy a formuláře.
+6. `docs/ARCHITECTURE.md` — závazné technologické vrstvy a provoz.
+7. `DEPLOY.md` — odsouhlasený směr budoucího veřejného nasazení (bez dosud určených detailů).
 
 `HISTORIE.md` je archiv dialogu, nikoli závazná technická specifikace.
 
