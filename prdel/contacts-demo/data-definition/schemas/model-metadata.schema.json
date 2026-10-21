@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Data Model Metadata v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "modelId",
+    "entities"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "modelId": {
+      "type": "string"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "from",
+          "to"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "oneToMany",
+              "manyToOne",
+              "manyToMany"
+            ]
+          },
+          "from": {
+            "$ref": "#/$defs/endpoint"
+          },
+          "to": {
+            "$ref": "#/$defs/endpoint"
+          },
+          "onDelete": {
+            "enum": [
+              "cascade",
+              "restrict",
+              "setNull",
+              "none"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "optionSets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "value",
+                "labels"
+              ],
+              "properties": {
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "labels": {
+                  "type": "object",
+                  "propertyNames": {
+                    "pattern": "^[0-9]+$"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "required": [
+        "entity",
+        "attribute"
+      ],
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "attribute": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
