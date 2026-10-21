@@ -56,3 +56,16 @@ Související dokumenty: GRID_METADATA.md, API.md, DATA_SOURCE_TESTING.md, ../sc
 ## Potvrzené doplnění výběru (2026-10-21)
 - [x] D06 selection.mode = none / single / multiple. none = bez označování a checkboxů; single = nejvýše jeden označený řádek; multiple = více řádků. selectAllScope jen pro multiple. Otevírání záznamu je nezávislé. Zapsáno do GRID_METADATA.md a schemas/grid.schema.json.
 - [ ] G17 zůstává otevřené: zachování nebo zrušení výběru při stránkování, filtrování a přepnutí pohledu.
+
+
+## Upřesnění G01/G02 — lookup navigace a datový kontrakt (2026-10-21)
+
+**Stav: pouze poznámka k budoucímu návrhu, nerozhodnuto; neměnit zatím JSON Schema ani renderer.**
+
+- [ ] **Klikatelné lookupy a navigace mezi entitami jako v Dynamics 365.** Grid bude umět zobrazit lookup jako odkaz a otevřít příslušný záznam cílové entity.
+- [ ] **Nejdříve navrhnout model entity a strukturu dat vracených REST API.** Inspirace modelem entit a lookupů v D365; teprve potom určit metadata sloupců a navigace.
+- [ ] **Výsledná sada může obsahovat hodnoty z jiných, souvisejících entit.** Grid zpracovává výsledné řádky a sloupce podle API kontraktu; sám neprovádí JOINy ani nenačítá vazby mezi entitami.
+- [ ] **Původ hodnot a sestavení výsledné sady jsou odpovědností zdroje za REST API.** REST kontrakt konkrétního seznamu (např. kontakty) určí, které hodnoty a identifikátory poskytuje. Metadata rendereru popíší jejich zobrazení a proklik, nikoli implementaci databázových vazeb.
+- [ ] **Otevřené otázky:** jak reprezentovat lookup ID, zobrazovaný text a typ cílové entity; jak pojmenovat hodnoty z připojených entit (flat alias vs nested objekt); jak popsat navigační cíl; co s prázdným lookupem a případným polymorfním lookupem.
+
+**Vazby na backlog:** G01 (zdroj/prezentace sloupce), G02 (lookup), G03 (subgrid), G27 (parita mock/rest). Rozhodnutí přijmout až po návrhu entity a návratového JSON kontraktu.
