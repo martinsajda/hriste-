@@ -1,0 +1,72 @@
+// Datovy model: registr entit, vztahu a sdilenych option setu.
+// Vztah contact -> telephone je 1:N; backend zajistuje referencni integritu.
+// Option set hodnoty jsou invariantni kody, labels jsou preklady dle LCID.
+{
+  "schemaVersion": 1,
+  "modelId": "contacts-demo",
+  "entities": [
+    "contact",
+    "telephone"
+  ],
+  "relationships": [
+    {
+      "name": "contact_telephones",
+      "type": "oneToMany",
+      "from": {
+        "entity": "contact",
+        "attribute": "id"
+      },
+      "to": {
+        "entity": "telephone",
+        "attribute": "contactId"
+      },
+      "onDelete": "cascade"
+    }
+  ],
+  "optionSets": {
+    "telephoneType": {
+      "options": [
+        {
+          "value": "mobile",
+          "labels": {
+            "1029": "Mobil",
+            "1031": "Mobil",
+            "1033": "Mobile"
+          }
+        },
+        {
+          "value": "landline",
+          "labels": {
+            "1029": "Pevná linka",
+            "1031": "Festnetz",
+            "1033": "Landline"
+          }
+        },
+        {
+          "value": "fax",
+          "labels": {
+            "1029": "Fax",
+            "1031": "Fax",
+            "1033": "Fax"
+          }
+        },
+        {
+          "value": "work",
+          "labels": {
+            "1029": "Telefon do práce",
+            "1031": "Arbeit",
+            "1033": "Work"
+          }
+        },
+        {
+          "value": "other",
+          "labels": {
+            "1029": "Jiný",
+            "1031": "Sonstige",
+            "1033": "Other"
+          }
+        }
+      ]
+    }
+  }
+}
