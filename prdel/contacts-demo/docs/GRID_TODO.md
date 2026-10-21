@@ -52,3 +52,7 @@ Schválený základ: GRID_METADATA.md. Zde evidujeme neuzavřené otázky před 
 Každému bodu ponechat ID. Po rozhodnutí doplnit konkrétní závěr a dotčené soubory; teprve potom změnit schema, metadata a API. Nejprve řešit P0, potom P1. P2 není podmínkou první verze.
 
 Související dokumenty: GRID_METADATA.md, API.md, DATA_SOURCE_TESTING.md, ../schemas/README.md.
+
+## Potvrzené doplnění výběru (2026-10-21)
+- [x] D06 selection.mode = none / single / multiple. none = bez označování a checkboxů; single = nejvýše jeden označený řádek; multiple = více řádků. selectAllScope jen pro multiple. Otevírání záznamu je nezávislé. Zapsáno do GRID_METADATA.md a schemas/grid.schema.json.
+- [ ] G17 zůstává otevřené: zachování nebo zrušení výběru při stránkování, filtrování a přepnutí pohledu.
