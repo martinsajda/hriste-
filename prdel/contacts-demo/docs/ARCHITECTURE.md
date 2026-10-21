@@ -137,3 +137,18 @@ console.log(metadata.logicalName);
 Příklad ukazuje pouze princip nativního načítání; úplná metadata a jejich validace se řídí [METADATA_MODEL.md](METADATA_MODEL.md) a budoucím JSON Schema.
 
 **Důsledek pro implementaci:** XML parser, XSD ani dvojí reprezentace metadat nejsou požadavkem frameworku. JSON je jednotná serializační hranice mezi metadatovým modelem, renderery a aplikačními REST kontrakty, aniž by tím vzniklo generické CRUD API (viz předchozí ADR).
+
+
+## ADR-2026-10-21: WYSIWYG editory a metadatové API se souborovým providerem
+
+**Stav: SCHVÁLENO — architektonický směr; implementace a přesné kontrakty odloženy.**
+
+Model-driven platforma bude obsahovat vizuální editory **entit a atributů, vztahů/option setů, formulářů a jejich layoutu, gridů/pohledů a jejich layoutu, a konfigurace aplikačních datových zdrojů/REST endpointů a kontraktů**. Cílem je navrhovat aplikace bez ručního psaní JSON. Návrháři budou upravovat kanonická metadata přes WYSIWYG UI s validací a náhledem.
+
+**Jeden model:** Editory a runtime renderery pracují se stejnými verzovanými JSON kontrakty (viz ADR JSON a [METADATA_MODEL.md](METADATA_MODEL.md)). JSONC je jen dokumentace; XML není alternativní formát. Rozpracovaný UI stav editoru není součástí publikovaných metadat. Pro živý náhled formulářů a gridů pokud možno znovu používat skutečné runtime renderery.
+
+**Samostatné metadatové API:** Vytváření, čtení, validace a ukládání definic probíhá přes backendové API správy metadat. Jeho provider rozhoduje o fyzickém úložišti; **první implementace bude souborová**, s JSON dokumenty v adresářové struktuře serverové aplikace. Pozdější výměna za databázové úložiště nesmí vyžadovat změny editorů. Toto API není univerzální CRUD API pro business entity ani náhrada jejich aplikačně specifických REST endpointů.
+
+**Bezpečnostní hranice:** Soubory metadat mají být výchozím nastavením **mimo veřejný document root** nebo chráněny zákazem přímého přístupu. Frontend načítá jen potřebná publikovaná metadata přes HTTP (`fetch`), buď ze staticky vystavených JSON, nebo z čtecího API. **Zápis provádí výhradně autorizovaný backend**, s validací a bezpečnou manipulací se soubory. Tajné údaje, autentizační cookie/session ID, API klíče a connection stringy se do klientsky dostupných metadat neukládají. U statického hostingu je pro zápis nutná serverová komponenta.
+
+**Detailní návrhy a otevřené otázky** jsou odděleny do složky [editors](../editors/README.md): [entity editor](../editors/ENTITY_EDITOR.md), [form editor](../editors/FORM_EDITOR.md), [grid editor](../editors/GRID_EDITOR.md), [data-source editor](../editors/DATA_SOURCE_EDITOR.md) a [metadata API / storage](../editors/METADATA_API.md). Přesné API endpointy, JSON Schema editorů, struktura úložiště, verzování, publikace, konkurentní editace a audit budou dopracovány později.
