@@ -18,32 +18,100 @@
 {
   "id": "contacts-grid",
   "type": "grid",
-  "title": "Moje kontakty",
   "entity": "contact",
   "dataSource": {
     "type": "rest",
     "endpoint": "/api/contacts",
     "method": "GET",
-    "response": { "idField": "id" }
+    "response": {
+      "idField": "id"
+    }
   },
   "columns": [
-    { "field": "firstName", "header": "Jméno", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 160, "minWidth": 100, "resizable": true },
-    { "field": "lastName", "header": "Příjmení", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 190, "minWidth": 100, "resizable": true },
-    { "field": "address", "header": "Adresa", "dataType": "string", "sortable": true, "filterable": true, "visible": true, "width": 240, "minWidth": 100, "resizable": true },
-    { "field": "description", "header": "Popis", "dataType": "string", "sortable": false, "filterable": true, "visible": false, "width": 300, "minWidth": 100, "resizable": true }
+    {
+      "field": "firstName",
+      "dataType": "string",
+      "sortable": true,
+      "filterable": true,
+      "visible": true,
+      "width": 160,
+      "minWidth": 100,
+      "resizable": true,
+      "labels": {
+        "1029": "Jméno",
+        "1031": "Vorname",
+        "1033": "First name"
+      }
+    },
+    {
+      "field": "lastName",
+      "dataType": "string",
+      "sortable": true,
+      "filterable": true,
+      "visible": true,
+      "width": 190,
+      "minWidth": 100,
+      "resizable": true,
+      "labels": {
+        "1029": "Příjmení",
+        "1031": "Nachname",
+        "1033": "Last name"
+      }
+    },
+    {
+      "field": "address",
+      "dataType": "string",
+      "sortable": true,
+      "filterable": true,
+      "visible": true,
+      "width": 240,
+      "minWidth": 100,
+      "resizable": true,
+      "labels": {
+        "1029": "Adresa",
+        "1031": "Adresse",
+        "1033": "Address"
+      }
+    },
+    {
+      "field": "description",
+      "dataType": "string",
+      "sortable": false,
+      "filterable": true,
+      "visible": false,
+      "width": 300,
+      "minWidth": 100,
+      "resizable": true,
+      "labels": {
+        "1029": "Popis",
+        "1031": "Beschreibung",
+        "1033": "Description"
+      }
+    }
   ],
   "sorting": {
     "enabled": true,
     "default": [
-      { "field": "lastName", "direction": "asc" },
-      { "field": "firstName", "direction": "asc" }
+      {
+        "field": "lastName",
+        "direction": "asc"
+      },
+      {
+        "field": "firstName",
+        "direction": "asc"
+      }
     ]
   },
   "pagination": {
     "enabled": true,
     "mode": "client",
     "defaultPageSize": 20,
-    "pageSizeOptions": [10, 20, 50, 100],
+    "pageSizeOptions": [
+      10,
+      20,
+      50,
+      100
+    ],
     "showTotalCount": true
   },
   "filtering": {
@@ -53,15 +121,79 @@
     "caseSensitive": false,
     "combine": "and"
   },
-  "selection": { "mode": "multiple", "showCheckboxes": true },
+  "selection": {
+    "mode": "multiple",
+    "showCheckboxes": true
+  },
   "recordOpening": {
     "enabled": true,
     "trigger": "column",
     "field": "lastName",
-    "target": { "type": "form", "entity": "contact", "form": "detail" }
+    "target": {
+      "type": "form",
+      "entity": "contact",
+      "form": "detail"
+    }
+  },
+  "localization": {
+    "defaultLcid": 1029,
+    "supportedLcids": [
+      1029,
+      1033,
+      1031
+    ],
+    "labels": {
+      "1029": {
+        "title": "Moje kontakty",
+        "rowsPerPage": "Řádků na stránku",
+        "totalItems": "Celkem záznamů",
+        "selectedItems": "Vybráno",
+        "page": "Stránka",
+        "of": "z",
+        "noRecords": "Žádné záznamy",
+        "noResults": "Žádné odpovídající záznamy",
+        "filterPlaceholder": "Filtrovat…",
+        "nextPage": "Další stránka",
+        "previousPage": "Předchozí stránka"
+      },
+      "1031": {
+        "title": "Meine Kontakte",
+        "rowsPerPage": "Zeilen pro Seite",
+        "totalItems": "Datensätze insgesamt",
+        "selectedItems": "Ausgewählt",
+        "page": "Seite",
+        "of": "von",
+        "noRecords": "Keine Datensätze",
+        "noResults": "Keine passenden Datensätze",
+        "filterPlaceholder": "Filtern…",
+        "nextPage": "Nächste Seite",
+        "previousPage": "Vorherige Seite"
+      },
+      "1033": {
+        "title": "My Contacts",
+        "rowsPerPage": "Rows per page",
+        "totalItems": "Total records",
+        "selectedItems": "Selected",
+        "page": "Page",
+        "of": "of",
+        "noRecords": "No records",
+        "noResults": "No matching records",
+        "filterPlaceholder": "Filter…",
+        "nextPage": "Next page",
+        "previousPage": "Previous page"
+      }
+    }
   }
 }
 ```
+
+## Lokalizace všech popisků pomocí LCID
+
+- `localization.defaultLcid` je výchozí LCID, zde `1029` (cs-CZ). `supportedLcids` uvádí podporované jazykové varianty. LCID je číselný Windows/Microsoft identifikátor, nikoli přímo ISO kód; například `1029` = cs-CZ, `1033` = en-US, `1031` = de-DE, `1051` = sk-SK.
+- `localization.labels` obsahuje lokalizované texty gridu: titulek, ovládání stránkování, počty záznamů, stav výběru, prázdné výsledky, navigační tlačítka a placeholder filtrů. `columns[].labels` obsahuje překlady nadpisu konkrétního sloupce. Všechna lokalizovaná pole používají stejný vzor mapy `{ "1029": "...", "1033": "..." }` (LCID je klíč JSON objektu, tedy řetězec).
+- Aktuální LCID poskytne aplikační kontext uživatele, nikoli jednotlivý grid. Pokud pro daný text chybí překlad v aktuálním LCID, použije se překlad `defaultLcid`; pokud chybí i ten, jde o neplatnou definici metadat. Pro každý lokalizovaný text je tedy výchozí jazyk povinný.
+- Technické názvy polí, ID, REST parametry, enumy a datové hodnoty se **nepřekládají**. Stejný mechanismus lokalizace se později použije pro formuláře a dialogy.
+- Popisky patřící rendereru, které nejsou v konkrétním gridu uvedeny, musí být definovány v samostatném sdíleném lokalizačním katalogu; žádný uživatelsky viditelný text se nesmí napevno zapisovat do rendereru. Konkrétní schéma sdíleného katalogu bude navrženo zvlášť.
 
 ## Viditelnost, šířky a otevření záznamu
 
