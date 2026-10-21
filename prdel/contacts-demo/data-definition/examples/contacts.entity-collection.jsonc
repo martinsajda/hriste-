@@ -2,11 +2,14 @@
 // id entity je GUID konkretniho zaznamu; attributes jsou nativni JSON hodnoty.
 // Null znamena explicitne prazdnou hodnotu; vynechane pole se bude resit samostatne.
 {
+  // Logicky nazev entity v kolekci.
   "entityName": "contact",
+  // Zaznamy; hodnoty jsou nativni JSON, typ urcuje EntityMetadata.
   "entities": [
     {
       "logicalName": "contact",
       "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+      // Nazvy atributu odpovidaji EntityMetadata; bez type/value obalek.
       "attributes": {
         "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
         "firstName": "Jana",
@@ -16,6 +19,7 @@
       }
     }
   ],
+  // Informace o strankovani; nezavisle na UI gridu.
   "paging": {
     "page": 1,
     "pageSize": 20,
