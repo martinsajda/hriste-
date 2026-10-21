@@ -2,12 +2,16 @@
 // Vztah contact -> telephone je 1:N; backend zajistuje referencni integritu.
 // Option set hodnoty jsou invariantni kody, labels jsou preklady dle LCID.
 {
+  // Verze definice modelu, nezavisla na verzi API.
   "schemaVersion": 1,
+  // Stabilni identifikator modelu.
   "modelId": "contacts-demo",
+  // Registr logickych nazvu entit.
   "entities": [
     "contact",
     "telephone"
   ],
+  // Definice vazeb mezi entitami; implementace vztahu zustava na backendu.
   "relationships": [
     {
       "name": "contact_telephones",
@@ -23,6 +27,7 @@
       "onDelete": "cascade"
     }
   ],
+  // Sdilene vycty s invariantnimi hodnotami a LCID preklady.
   "optionSets": {
     "telephoneType": {
       "options": [
