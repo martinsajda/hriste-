@@ -3,10 +3,14 @@
 // logicalName atributu musi odpovidat klicum v attributes datoveho zaznamu.
 {
   "schemaVersion": 1,
+  // Technicky nazev entity, pouziva se v Entity.logicalName.
   "logicalName": "contact",
   "collectionName": "contacts",
+  // Nazev atributu primarniho GUID.
   "primaryIdAttribute": "id",
+  // Atribut zobrazovaneho nazvu; u slozeneho jmena bude nutne dalsi rozhodnuti.
   "primaryNameAttribute": "lastName",
+  // Nazvy entity podle LCID, nikoliv hodnoty konkretniho zaznamu.
   "displayNames": {
     "1029": "Kontakt",
     "1031": "Kontakt",
@@ -17,6 +21,7 @@
     "1031": "Kontakte",
     "1033": "Contacts"
   },
+  // Definice atributu: typ, povinnost, readonly a LCID labels.
   "attributes": [
     {
       "logicalName": "id",
