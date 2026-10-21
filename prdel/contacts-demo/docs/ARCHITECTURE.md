@@ -34,3 +34,7 @@ První verze poslouchá pouze na `127.0.0.1`, nemá autentizaci ani šifrování
 ## Stav implementace
 
 Tento dokument je **závazný popis cílové architektury**, nikoli potvrzení hotové implementace. Datový model a REST API jsou schváleny; finální JSON schéma rendereru ještě čeká na schválení. Existující implementaci je nutné uvést do souladu s těmito kontrakty.
+
+## Rozhodnutí o vývoji rendereru bez databáze (21. 10. 2026)
+
+Frontend běží výhradně přes HTTP/HTTPS; `file://` ani zabalená metadata nejsou podporována. Metadata se vždy načítají přes `fetch()` ze statických JSON souborů. Pro data jsou pouze dva centrálně přepínané režimy: `mock` (statický JSON přes GET a klientský adaptér pro filtrování/stránkování, bez aplikačního backendu a DB) a `rest` (skutečné REST API a databáze). Lokálně stačí jednoduchý statický webserver; stejný frontend musí fungovat pod IIS nebo Apache. Podrobný závazný návrh: [DATA_SOURCE_TESTING.md](DATA_SOURCE_TESTING.md). Implementace je odložena.
