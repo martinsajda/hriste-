@@ -218,6 +218,31 @@ Tento soubor je **chronologický záznam dialogu**, nikoli syntéza zadání. Sy
 **Poznámka archivace:** Aktuální asistentská odpověď byla v chatu částečně vykreslena jako tabulka a interaktivní prvky. Zde je zapsán její obsah, nikoliv doslovná podoba všech UI prvků.
 
 
+
+## 2026-10-21 — sjednocení starších dokumentů
+
+**Uživatel:**
+
+> Nevím, co je sjednocení starších dokumentů. Tato to však proveď a informuj mě o stavu, co si sjednotil, co si smazal, co si založil a tak podobně.
+
+**Asistent (provedené změny a průběžná odpověď):**
+
+> **Sjednocení starších dokumentů znamená opravit jejich obsah tak, aby všechny popisovaly stejné, aktuálně schválené zadání.** Například README dosud uváděl staré adresy API a architektonický dokument počítal jen s macOS.
+>
+> Úpravy jsem nyní provedl přímo na GitHubu. Neměnil jsem aplikaci ani její zdrojový kód.
+>
+> Upravil jsem:
+>
+> - `README.md`: entity, GUID, deset REST endpointů, formulářová pole a ukázku JSON metadat.
+> - `docs/ARCHITECTURE.md`: společná architektura Windows/macOS a plánované portace C#/PHP.
+> - `AGENTS.md`: zdroje pravdy, jednoagentní režim a pravidlo vedení historie.
+> - `docs/DATOVY_MODEL.md`: předávání `ContactId` při vytváření telefonu v těle POST.
+>
+> Smazané soubory: 0. Nové soubory: 0. Staré instrukce čtyř agentů zůstaly uložené, ale jsou neaktivní.
+
+**Poznámka archivace:** Text asistenta zde obsahuje věcný přepis průběžné odpovědi bez tabulkového rozvržení a UI komponent; nejde o úplný doslovný přepis.
+
+
 ---
 
 ## Pokračování
