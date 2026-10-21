@@ -181,6 +181,9 @@ Příklad konvence:
 
 ### JSON metadata a univerzální renderer
 
+**Schválený kontrakt gridů v1:** [GRID_METADATA.md](docs/GRID_METADATA.md). Grid podporuje klientské i serverové stránkování, vícesloupcové výchozí řazení, REST datový zdroj, sloupce s nadpisy, volbu počtu řádků a výběr řádků. Volitelné stránkovací REST parametry jsou specifikovány také v [API.md](docs/API.md). Renderer dosud neimplementujeme.
+
+
 Metadatové definice musí podporovat minimálně:
 
 1. **Navigaci a dashboard** — menu, dlaždice, cílové pohledy.
@@ -191,7 +194,7 @@ Metadatové definice musí podporovat minimálně:
 6. **Option set** — stabilní hodnoty a zobrazované popisky (např. `mobile` → Mobil).
 7. **Dialogy a akce** — konfigurovatelné potvrzení mazání a vazba akcí na příslušné REST operace.
 
-**Finální schéma JSON metadat ještě nebylo schváleno.** Do schválení neexistuje závazná ukázka JSON struktury. Renderer musí respektovat výše uvedené funkční požadavky a kontrakty datového modelu a REST API. Konkrétní schéma, datové vazby, validace a chování rendereru jsou samostatným otevřeným návrhovým úkolem.
+**Schéma metadat gridů v1 je schváleno v [GRID_METADATA.md](docs/GRID_METADATA.md); schéma formulářů a další části univerzálního rendereru ještě nejsou schváleny.** Do schválení neexistuje závazná ukázka JSON struktury. Renderer musí respektovat výše uvedené funkční požadavky a kontrakty datového modelu a REST API. Konkrétní schéma, datové vazby, validace a chování rendereru jsou samostatným otevřeným návrhovým úkolem.
 
 ## Spuštění na Windows
 
@@ -229,7 +232,8 @@ Jeden agent řeší databázi, REST API, metadata-driven frontend i testování 
 ## Dokumentace, historie a vizuální návrh
 
 - [Datový model](docs/DATOVY_MODEL.md) — závazný popis entit, GUID a vztahů.
-- [REST API](docs/API.md) — závazný popis všech 10 CRUD operací.
+- [REST API](docs/API.md) — závazný popis všech 10 CRUD operací včetně volitelného stránkování seznamů.
+- [Metadata gridů](docs/GRID_METADATA.md) — schválené JSON schéma gridů, klientské a serverové stránkování.
 - [Architektura](docs/ARCHITECTURE.md) — technologické vrstvy, lokální provoz a plánované portace.
 - [DEPLOY.md](DEPLOY.md) — budoucí automatizované nahrávání na PHP webhosting přes FTP/FTPS/SFTP.
 - [AGENTS.md](AGENTS.md) — instrukce pro jediného vývojového agenta.
