@@ -180,6 +180,45 @@ Frontend bude tvořen statickým HTML souborem (aplikační shell), CSS a JavaSc
 - **Ano** zavolá odpovídající DELETE endpoint a po úspěchu aktualizuje grid; **Ne** dialog zavře bez změny.
 - Při mazání kontaktu je vhodné upozornit, že se spolu s ním smažou i jeho telefonní čísla (kaskádové odstranění).
 
+### Centrální CSS a odpovědnosti rendereru — závazná pravidla
+
+- **Renderer generuje obecné HTML elementy** podle JSON metadat: např. `div`, `section`, `label`, `input`, `select`, `button`, `table` a související prvky. Řeší datové vazby, události a chování komponent, nikoliv jejich individuální vizuální styl.
+- **Jediný centrální CSS soubor** (navržený název `styles.css`) řídí vzhled a rozložení celé aplikace: dashboardu, navigace, gridů, formulářů, subgridů, tlačítek, dialogů, popisků, vstupních polí i jejich stavů.
+- **Styly se aplikují důsledně přes opakovaně použitelné CSS třídy**, nikoliv přes inline `style` atributy, JavaScriptové nastavování vizuálních vlastností nebo styly svázané s konkrétním ID či jedním formulářem.
+- Renderer přiřazuje HTML elementům konzistentní sémantické třídy, např. `app-field`, `app-field__label`, `app-field__input`, `app-button`, `app-grid`, `app-dialog`. Varianty a stavy mohou být vyjádřeny modifikačními třídami (např. `app-button--primary`, `is-invalid`).
+- **Rozložení formulářů a jejich prvků se vizuálně řídí centrálními CSS třídami.** JSON metadata určují strukturu, pořadí a seskupení komponent, zatímco CSS určuje jejich výsledné rozmístění, rozměry, odsazení a responzivní chování.
+- Změna společné třídy, např. `app-field__input` nebo `app-field__label`, se musí projevit napříč všemi formuláři bez úpravy jednotlivých JSON definic nebo rendereru.
+- **CSS musí být ručně čitelné a dokumentované:** každá významná třída nebo logicky související skupina tříd bude mít komentář vysvětlující účel, použití a případné varianty. Soubor bude členěný do pojmenovaných sekcí (základní proměnné, layout, navigace, formuláře, gridy, tlačítka, dialogy, stavy, responzivita).
+- Pro sdílené hodnoty používat centrální CSS custom properties (`--app-...`) pro barvy, mezery, typografii a další design tokeny. Tím lze měnit jednotný vizuální styl z jednoho místa.
+- **Nevytvářet další lokální CSS soubory, komponentové styly ani style bloky v HTML.** Případné nové komponenty se stylují rozšířením téhož centrálního souboru a opětovným použitím existujících tříd.
+
+Příklad konvence:
+
+```css
+/* Design tokeny: společné hodnoty pro celou aplikaci. */
+:root {
+  --app-space-sm: 8px;
+  --app-control-radius: 6px;
+}
+
+/* Kontejner jednoho formulářového pole: řídí rozložení popisku a vstupu. */
+.app-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-sm);
+}
+
+/* Popisek vstupního pole: jednotný vzhled všech labelů formulářů. */
+.app-field__label {
+  font-weight: 600;
+}
+
+/* Vstupní pole: společné okraje a zaoblení textových vstupů. */
+.app-field__input {
+  border-radius: var(--app-control-radius);
+}
+```
+
 ### JSON metadata a univerzální renderer
 
 Metadatové definice musí podporovat minimálně:
