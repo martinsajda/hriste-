@@ -847,3 +847,37 @@ Příklad uloženého pohledu (samostatný uživatelský JSON, nikoli část def
 ## 8. Rozsah mimo v2
 
 Inline editace, seskupování, agregace, virtual scrolling, select-all nad všemi stránkami a serverové sdílení uživatelských pohledů nejsou součástí v2. Zůstanou pro pozdější iterace. Žádný renderer, backend ani databázové schéma se touto dokumentační změnou nemění.
+
+
+## Výběr řádků — závazný kontrakt (21. 10. 2026)
+
+Metadata `selection.mode` určují, zda a kolik řádků může uživatel označit. Povolené hodnoty jsou `none`, `single`, `multiple` (název `multi` se nepoužívá).
+
+| `selection.mode` | Chování | Checkboxy / ovládání |
+| --- | --- | --- |
+| `none` | Grid je pouze pro prohlížení; nelze označit žádný řádek. | `showCheckboxes: false`, žádný výběrový sloupec ani checkbox v hlavičce. |
+| `single` | Lze označit **nejvýše jeden** řádek (také nula). Označení dalšího nahradí předchozí; opětovným kliknutím lze výběr zrušit. | `showCheckboxes: true` zobrazí ovládání výběru u každého řádku, **bez** select-all v hlavičce. |
+| `multiple` | Lze označit nula až více řádků. | `showCheckboxes: true` zobrazí checkboxy a volitelně select-all omezené na aktuální stránku. |
+
+Příklady:
+
+```json
+{"selection": {"mode": "none", "showCheckboxes": false}}
+```
+
+```json
+{"selection": {"mode": "single", "showCheckboxes": true}}
+```
+
+```json
+{"selection": {"mode": "multiple", "showCheckboxes": true, "selectAllScope": "currentPage"}}
+```
+
+Pravidla:
+- `mode` je povinný. Při `none` je `showCheckboxes` vždy `false` a `selectAllScope` není dovoleno; při `single` není `selectAllScope` dovoleno.
+- Pokud `showCheckboxes` není uvedeno, renderer použije `false` pro `none` a `true` pro `single`/`multiple`. Skrytí checkboxů při povoleném výběru je možné (`showCheckboxes: false`), ale způsob výběru musí být přístupný z klávesnice; při `none` není výběr možný žádným způsobem.
+- Výběr je oddělený od **otevření záznamu** (`recordOpening`); grid v režimu `none` může nadále otevírat detail kliknutím na odkaz či řádek.
+- Akce vyžadující označené řádky (`selection: "single"` nebo `"oneOrMore"` v definici akce) jsou při `mode: "none"` nedostupné. Hodnota `selection` u **akce** znamená požadavek na počet označených záznamů, nikoli režim výběru gridu.
+- Konkrétní chování zachování výběru při změně stránky, filtru či pohledu je stále otevřené v `GRID_TODO.md` (G17).
+
+Tato změna se týká pouze metadat a JSON Schema; renderer zatím není implementován.
