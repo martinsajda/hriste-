@@ -1,155 +1,90 @@
-# Entity / EntityCollection — pracovní návrh v1
+# Entity / EntityCollection — model-driven kontrakt
 
-**Stav:** návrh k revizi; žádný nový endpoint ani JSON Schema zatím není schválen.
+**Rozhodnutí 21. 10. 2026:** metadata datového modelu, entity a atributů jsou oddělena od runtime hodnot. Data jsou obrazem metadat; grid a budoucí formulář sdílejí stejné typové definice. Tento návrh **zatím není zaveden do REST API**.
 
-## Vzor podle Dynamics 365 SDK
+## Vrstvy a životní cyklus
 
-| D365 SDK pojem | Návrh v JSON | Účel |
+1. Načíst statická **ModelMetadata** a **EntityMetadata** přes HTTP `fetch()` (s cache/verzí).
+2. Načíst samostatná **FormMetadata** nebo **GridMetadata** (layout a chování; pro formuláře zatím pouze budoucí návrh).
+3. Načíst **Entity** nebo **EntityCollection** z mock/REST data provideru.
+4. Renderer pro každé pole spojí `logicalName` atributu s jeho definicí, vybere typ komponenty, label dle LCID, validace a hodnotu. Formulářové metadata mohou určit layout, nikoli změnit základní typ.
+5. Při uložení data validuje backend nezávisle na UI.
+
+## ModelMetadata
+
+Registr dostupných entit, vztahů a sdílených option setů. Ukázka: [model.metadata.json](examples/model.metadata.json), komentáře: [model.metadata.jsonc](examples/model.metadata.jsonc). Entity `contact` a `telephone` jsou spojeny vztahem 1:N; `telephone.contactId` ukazuje na kontakt.
+
+## EntityMetadata
+
+Každá entita má `logicalName`, `primaryIdAttribute`, `primaryNameAttribute`, `displayNames` a seznam `attributes`. Každý atribut má `logicalName`, `type`, `labels` a případná pravidla `required`, `readOnly`, `targets` (lookup) či `optionSet` (odkaz do katalogu). Popisky jsou mapy LCID 1029/1033/1031; fallback na centrální defaultLcid 1029.
+
+Příklady: [contact.entity-metadata.json](examples/contact.entity-metadata.json) a [telephone.entity-metadata.json](examples/telephone.entity-metadata.json), s komentovanými protějšky JSONC.
+
+## Podporované základní typy
+
+| Metadata `type` | Runtime JSON | Význam |
 | --- | --- | --- |
-| `EntityCollection` | `entityName`, `entities`, `paging` | Sada záznamů jedné entity |
-| `Entity` | `logicalName`, `id`, `attributes` | Jeden záznam a jeho atributy |
-| `AttributeCollection` | Mapa `logicalName -> AttributeValue` | Typované hodnoty |
-| `EntityReference` | `logicalName`, `id`, `name` | Lookup na jiný záznam |
-| `OptionSetValue` | `value` | Stabilní kód volby |
-| `EntityMetadata` | `logicalName`, `displayNames`, `attributes` | Definice entity oddělená od záznamů |
-| `AttributeMetadata` | `logicalName`, `type`, `displayNames`, ... | Typ a pravidla atributu |
+| `string` | string / null | Text |
+| `integer` | number (integer) / null | Celé číslo; hranice bezpečného rozsahu JS k rozhodnutí |
+| `decimal` | number nebo přesný string / null | Desetinné číslo; přesnost a kanonický formát zatím nerozhodnuty |
+| `dateTime` | ISO 8601 string / null | Datum a čas; UTC/timezone behavior otevřeno |
+| `guid` | UUID string / null | GUID |
+| `boolean` | boolean / null | Logická hodnota |
+| `optionSet` | invariantní string/integer kód / null | Popisky a volby z metadat |
+| `lookup` | EntityReference objekt / null | Reference na záznam jiné entity |
 
-`id` lookupu identifikuje **cílový záznam**. Název entity identifikuje **typ**; neplést s GUID definice entity.
+Další kandidáti: `dateOnly`, `money`, `bigInteger`, `multiOptionSet`, `state`, `status`, `file`, `image`. Neschvalovat jejich reprezentaci bez rozhodnutí.
 
-## Příklad datové odpovědi — návrh typovaných hodnot
+## Entity a EntityCollection
 
-```json
-{
-  "entityName": "contact",
-  "entities": [
-    {
-      "logicalName": "contact",
-      "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
-      "attributes": {
-        "firstname": {"type": "string", "value": "Jana"},
-        "lastname": {"type": "string", "value": "Nováková"},
-        "birthdate": {"type": "dateTime", "value": "1990-05-14T00:00:00Z"},
-        "isactive": {"type": "boolean", "value": true},
-        "rating": {"type": "integer", "value": 4},
-        "creditlimit": {"type": "decimal", "value": "12500.50"},
-        "category": {"type": "optionSet", "value": 100000001},
-        "parentcustomerid": {
-          "type": "lookup",
-          "value": {
-            "logicalName": "account",
-            "id": "d03e19b7-75bc-42f0-bbd7-96279e4d3120",
-            "name": "ACME s.r.o."
-          }
-        }
-      }
-    }
-  ],
-  "paging": {
-    "page": 1,
-    "pageSize": 20,
-    "totalItems": 1,
-    "totalPages": 1,
-    "moreRecords": false
-  }
-}
-```
-
-Toto je **ilustrativní** kontrakt, ne existující endpoint `/api/contacts`. `creditlimit` je string, aby přesná desetinná čísla nebyla omezena přesností JavaScript `Number`; k diskusi. `birthdate` je pouze příklad ISO 8601 a vyžaduje upřesnění date-only vs user-local.
-
-## Typy atributů
-
-| Typ | Hodnota | Poznámka |
-| --- | --- | --- |
-| `string` | JSON string | Text, případně délka/format v metadatech |
-| `integer` | JSON integer | Rozsah a 64bit integer dořešit |
-| `decimal` | Decimal string nebo number | Rozhodnout přesnost; doporučen string pro přesné finance |
-| `dateTime` | ISO 8601 string | UTC a timezone behavior definovat |
-| `guid` | UUID string | Kanonický GUID |
-| `boolean` | JSON true/false | Null zvlášť |
-| `optionSet` | Integer nebo stabilní string | D365 obvykle integer; stávající telefonní enum má string |
-| `lookup` | EntityReference objekt | logicalName + GUID záznamu + optional name |
-
-Potenciální rozšíření: `dateOnly`, `money`, `bigInteger`, `multiOptionSet`, `state`, `status`, `file`, `image`, `alias`.
-
-## Metadata entity — lokalizace LCID
+Ukázka runtime záznamu kontaktu:
 
 ```json
 {
   "logicalName": "contact",
-  "primaryIdAttribute": "contactid",
-  "primaryNameAttribute": "fullname",
-  "displayNames": {
-    "1029": "Kontakt",
-    "1033": "Contact",
-    "1031": "Kontakt"
-  },
+  "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
   "attributes": {
-    "firstname": {
-      "type": "string",
-      "displayNames": {
-        "1029": "Jméno",
-        "1033": "First name",
-        "1031": "Vorname"
-      },
-      "required": true
-    },
-    "parentcustomerid": {
-      "type": "lookup",
-      "displayNames": {
-        "1029": "Zákazník",
-        "1033": "Customer",
-        "1031": "Kunde"
-      },
-      "targets": ["account"]
-    },
-    "category": {
-      "type": "optionSet",
-      "displayNames": {
-        "1029": "Kategorie",
-        "1033": "Category",
-        "1031": "Kategorie"
-      },
-      "options": [
-        {
-          "value": 100000001,
-          "labels": {
-            "1029": "Klíčový",
-            "1033": "Key",
-            "1031": "Wichtig"
-          }
-        }
-      ]
-    }
+    "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+    "firstName": "Jana",
+    "lastName": "Nováková",
+    "address": "Brno",
+    "description": null
   }
 }
 ```
 
-`displayNames` a `labels` jsou mapy LCID; výchozí a podporované LCID jsou centrálně v `app.config.json`. Nezapisovat přeložené názvy místo invariantních hodnot do samotných záznamů.
+Kolekce vrací `entityName`, `entities[]` a `paging` s `page`, `pageSize`, `totalItems`, `totalPages`, `moreRecords`. Ukázky: [contacts.entity-collection.json](examples/contacts.entity-collection.json) a [telephones.entity-collection.json](examples/telephones.entity-collection.json).
 
-**Pozor:** Ukázka používá D365-like názvy `contactid`, `firstname`, `fullname`; stávající demo API používá `id`, `firstName` atd. Je nutné rozhodnout, zda jde o novou SDK-like reprezentaci, aliasy nebo změnu stávajícího kontraktu. Ukázka není deklarací skutečných polí existující demo entity.
+**Důležité:** Typ hodnoty se neuvádí u každého atributu zvlášť; renderer jej čte z EntityMetadata. To platí pro grid i formulář.
 
-## Hodnoty z jiných entit
+## Lookup = EntityReference
 
-Například grid kontaktů může zobrazovat `account.name` nebo jiné hodnoty souvisejících entit. API musí vrátit požadované hodnoty v jedné výsledné sadě. Uvažované varianty:
-- **Flat alias** v `attributes`, např. `account.name` nebo `account_name`, s doplňkovým `source` popisem.
-- **Typovaný aliased value** obsahující původní entitu, atribut a hodnotu.
-- **Nested objekt** s jednoznačným kontextem vztahu.
+```json
+{
+  "logicalName": "contact",
+  "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+  "name": "Jana Nováková"
+}
+```
 
-Nejdřív definovat datový kontrakt a pravidla pro aliasy, potom lookup proklik a metadata gridu. Renderer **nesestavuje JOIN**; backend má odpovědnost za dotaz a návratovou sadu.
+`logicalName` je logický název cílové entity, `id` je **GUID konkrétního cílového záznamu**, `name` je pomocný zobrazovaný text. Metadata lookup atributu obsahují `targets` se seznamem povolených entit. Z toho může grid či formulář později vytvořit klikací navigaci.
 
-## Zásady pro budoucí implementaci
+## Option set a lokalizace
 
-- Typový kontrakt musí fungovat stejně v `mock` a `rest` režimu.
-- Formát odpovědi nemá nutit frontend znát SQLite, SQL Server, FetchXML nebo jiný provider.
-- Metadata mohou být samostatný statický JSON, načítaný přes HTTP `fetch`; entity jsou runtime data.
-- Při stránkování vracet konzistentní počty a stabilní identitu záznamu.
-- Backend určuje oprávnění a vrací pouze dostupné hodnoty; frontend se nesmí spoléhat na pouhé skrytí sloupců.
+Runtime hodnota telefonu `type: "mobile"` je invariantní kód. Její popisek (Mobil / Mobile / Mobil) se získá z `model.metadata.json` → `optionSets.telephoneType.options` podle aktuálního LCID. Formulář může z těchto metadat sestavit dropdown, grid zobrazí lokalizovaný text. Případná změna na integer kódy D365 zůstává otevřená.
 
-## Klíčové otázky k rozhodnutí
+## Atributy z jiných entit
 
-1. Chceme plné typované obálky `{"type","value"}` pro každý atribut, nebo kompaktní nativní JSON + samostatná metadata?
-2. Chceme ponechat jednoduché CRUD API v1 a vytvořit vedle něj SDK-like datový kontrakt, nebo jej nahradit?
-3. Chceme napodobit D365 integer OptionSetValue, nebo ponechat i string kódy?
-4. Jak mají vypadat aliased values z připojených entit?
-5. Jak reprezentovat rozdíl `null`, nevrácený atribut a nenačtený lookup?
-6. Jak zajistit stabilní navigaci lookupu a lokalizované názvy bez dalších requestů?
+REST API může do výsledné sady doplnit hodnoty z navázaných entit. Renderer nesmí sestavovat JOIN ani znát SQL/FetchXML. Reprezentace aliased values (flat/nested/typed source) **zatím není schválena** a je předmětem DD05 a GRID_TODO G01/G02. Navigace lookupu se navrhne po rozhodnutí o struktuře.
+
+## Validace a kompatibilita
+
+- JSON Schema Draft 2020-12 v [schemas](schemas/) kontroluje základní tvar tří dokumentů. Je to **návrhové schéma**, nikoli úplný důkaz správnosti.
+- Sémantická validace musí navíc zkontrolovat atributy proti EntityMetadata, unikátní logicalName, existenci option setů/lookup targets, GUID, hodnoty option setů, LCID fallback a konzistenci ID.
+- Stávající `docs/API.md` vrací jednoduché objekty, ne EntityCollection. Přechod vyžaduje výslovné rozhodnutí, ne tichou změnu.
+- Metadata i data přes HTTP/HTTPS; žádné `file://`. Dva datové režimy `mock` a `rest`, stejný kontrakt na vstupu rendereru.
+- Metadata mohou být cacheována; data se aktualizují nezávisle. Backend zůstává autoritou pro práva a integritu.
+
+## Neuzavřené otázky
+
+Viz [README.md](README.md), sekce DD01–DD10. Zejména mapování starého API, decimal/datetime, option set integer vs string, aliasy z relací, null vs absent, primaryNameAttribute a struktura budoucích form metadat.
