@@ -179,6 +179,10 @@ Příklad konvence:
 }
 ```
 
+### Centrální lokalizace
+
+Výchozí LCID a podporované jazyky jsou definovány výhradně v kořenovém [`app.config.json`](app.config.json). Gridy a formuláře obsahují jen překlady textů podle LCID, nikoli vlastní `defaultLcid` či `supportedLcids`. Aktuální jazyk určuje aplikační kontext; při chybějícím překladu se použije centrální výchozí LCID (`1029`, čeština). Implementace lokalizace zatím neproběhla.
+
 ### JSON metadata a univerzální renderer
 
 **Schválený kontrakt gridů v1:** [GRID_METADATA.md](docs/GRID_METADATA.md). Grid podporuje klientské i serverové stránkování, vícesloupcové výchozí řazení, REST datový zdroj, sloupce s nadpisy, volbu počtu řádků, výběr řádků a fulltextové filtrování jednotlivých sloupců (`contains`) v klientském i serverovém režimu. Volitelné stránkovací REST parametry jsou specifikovány také v [API.md](docs/API.md). Renderer dosud neimplementujeme.
