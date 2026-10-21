@@ -1,0 +1,665 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contacts-demo/schemas/grid.schema.json",
+  "title": "Universal Grid Metadata v2",
+  "description": "Strojově čitelný kontrakt gridu; sémantické vazby mezi sloupci, akcemi a endpointy vyžadují další validaci.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "type",
+    "entity",
+    "dataSource",
+    "columns"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Volitelná cesta k tomuto schématu pro editor."
+    },
+    "schemaVersion": {
+      "const": 2,
+      "description": "Verze metadat; povinná hodnota 2."
+    },
+    "id": {
+      "type": "string",
+      "description": "Jedinečné ID instance gridu.",
+      "minLength": 1
+    },
+    "type": {
+      "const": "grid"
+    },
+    "entity": {
+      "type": "string",
+      "description": "Logický název entity.",
+      "minLength": 1
+    },
+    "dataSource": {
+      "type": "object",
+      "description": "REST zdroj a případný POST endpoint pro složité dotazy.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "endpoint",
+        "method",
+        "response"
+      ],
+      "properties": {
+        "type": {
+          "const": "rest"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "GET endpoint, např. /api/contacts."
+        },
+        "method": {
+          "const": "GET"
+        },
+        "response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "idField"
+          ],
+          "properties": {
+            "idField": {
+              "type": "string",
+              "description": "Pole unikátního ID."
+            }
+          }
+        },
+        "advancedSearch": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "endpoint",
+            "method",
+            "requestMode",
+            "response"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "method": {
+              "const": "POST"
+            },
+            "requestMode": {
+              "const": "structured"
+            },
+            "response": {
+              "$ref": "#/$defs/responseMapping"
+            }
+          }
+        }
+      }
+    },
+    "columns": {
+      "type": "array",
+      "description": "Pořadí sloupců v definici; vlastní vlastnosti v grid-column.schema.json.",
+      "minItems": 1,
+      "items": {
+        "$ref": "grid-column.schema.json"
+      }
+    },
+    "sorting": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "default": {
+          "type": "array",
+          "description": "Výchozí vícesloupcové řazení.",
+          "items": {
+            "$ref": "#/$defs/sort"
+          }
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "mode"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "client",
+            "server"
+          ]
+        },
+        "defaultPageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "pageSizeOptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "showTotalCount": {
+          "type": "boolean"
+        },
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pageParam": {
+              "type": "string"
+            },
+            "pageSizeParam": {
+              "type": "string"
+            },
+            "sortParam": {
+              "type": "string"
+            },
+            "filterParamPrefix": {
+              "type": "string"
+            }
+          }
+        },
+        "response": {
+          "$ref": "#/$defs/responseMapping"
+        }
+      }
+    },
+    "filtering": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "display": {
+          "enum": [
+            "columnHeader"
+          ]
+        },
+        "combine": {
+          "enum": [
+            "and"
+          ]
+        },
+        "defaultOperator": {
+          "type": "string"
+        },
+        "caseSensitive": {
+          "type": "boolean"
+        },
+        "globalSearch": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "fields",
+            "operator"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "fields": {
+              "type": "array",
+              "description": "Textová pole zahrnutá do globálního hledání.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "operator": {
+              "const": "contains"
+            },
+            "debounceMs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minLength": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "operators": {
+          "type": "object",
+          "description": "Povolené operátory podle typu.",
+          "propertyNames": {
+            "enum": [
+              "string",
+              "integer",
+              "decimal",
+              "date",
+              "datetime",
+              "boolean",
+              "enum",
+              "guid"
+            ]
+          },
+          "additionalProperties": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "contains",
+                "equals",
+                "startsWith",
+                "endsWith",
+                "isEmpty",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "between",
+                "before",
+                "after",
+                "in",
+                "notIn"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "none",
+            "single",
+            "multiple"
+          ]
+        },
+        "showCheckboxes": {
+          "type": "boolean"
+        },
+        "selectAllScope": {
+          "enum": [
+            "currentPage"
+          ]
+        }
+      }
+    },
+    "recordOpening": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "trigger": {
+          "enum": [
+            "column",
+            "row"
+          ]
+        },
+        "field": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/formTarget"
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "description": "Registr akcí; toolbar/contextMenu odkazují na ID.",
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    },
+    "toolbar": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "actions": {
+          "type": "array",
+          "description": "ID akcí v toolbaru.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "contextMenu": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "actions": {
+          "type": "array",
+          "description": "ID akcí v kontextovém menu.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "views": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "defaultViewId": {
+          "type": "string"
+        },
+        "allowCreate": {
+          "type": "boolean"
+        },
+        "allowRename": {
+          "type": "boolean"
+        },
+        "allowDelete": {
+          "type": "boolean"
+        },
+        "allowSetDefault": {
+          "type": "boolean"
+        },
+        "persistence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "provider": {
+              "const": "localStorage"
+            },
+            "key": {
+              "type": "string"
+            },
+            "scope": {
+              "const": "user"
+            }
+          }
+        },
+        "save": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columnOrder": {
+              "type": "boolean"
+            },
+            "columnVisibility": {
+              "type": "boolean"
+            },
+            "columnWidths": {
+              "type": "boolean"
+            },
+            "columnPinning": {
+              "type": "boolean"
+            },
+            "sorting": {
+              "type": "boolean"
+            },
+            "filters": {
+              "type": "boolean"
+            },
+            "pageSize": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "formats": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "csv",
+              "xlsx"
+            ]
+          }
+        },
+        "defaultFormat": {
+          "enum": [
+            "csv",
+            "xlsx"
+          ]
+        },
+        "scopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "currentPage",
+              "filtered",
+              "selected"
+            ]
+          }
+        },
+        "defaultScope": {
+          "enum": [
+            "currentPage",
+            "filtered",
+            "selected"
+          ]
+        },
+        "columns": {
+          "enum": [
+            "visible",
+            "all"
+          ]
+        },
+        "respectColumnOrder": {
+          "type": "boolean"
+        },
+        "respectSorting": {
+          "type": "boolean"
+        },
+        "useLocalizedHeaders": {
+          "type": "boolean"
+        },
+        "csv": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "delimiter": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1
+            },
+            "encoding": {
+              "const": "utf-8"
+            },
+            "includeBom": {
+              "type": "boolean"
+            }
+          }
+        },
+        "xlsx": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sheetName": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 31
+            },
+            "freezeHeader": {
+              "type": "boolean"
+            },
+            "autoFilter": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "localization": {
+      "type": "object",
+      "description": "Jen překlady konkrétního gridu; defaultLcid je v app.config.json.",
+      "additionalProperties": false,
+      "properties": {
+        "labels": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[0-9]+$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "direction"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      }
+    },
+    "responseMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "itemsPath": {
+          "type": "string"
+        },
+        "pagePath": {
+          "type": "string"
+        },
+        "pageSizePath": {
+          "type": "string"
+        },
+        "totalItemsPath": {
+          "type": "string"
+        },
+        "totalPagesPath": {
+          "type": "string"
+        }
+      }
+    },
+    "formTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity",
+        "form"
+      ],
+      "properties": {
+        "type": {
+          "const": "form"
+        },
+        "entity": {
+          "type": "string"
+        },
+        "form": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "create",
+            "edit",
+            "view"
+          ]
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "handler",
+        "selection",
+        "labels"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "handler": {
+          "enum": [
+            "openForm",
+            "deleteRecords",
+            "refreshGrid",
+            "exportGrid"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/formTarget"
+        },
+        "selection": {
+          "enum": [
+            "none",
+            "single",
+            "oneOrMore",
+            "any"
+          ]
+        },
+        "confirmation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "messageKey": {
+              "type": "string"
+            }
+          }
+        },
+        "labels": {
+          "type": "object",
+          "description": "Překlady podle číselného LCID z app.config.json; klíče jsou řetězce.",
+          "propertyNames": {
+            "pattern": "^[0-9]+$"
+          },
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 1
+        },
+        "icon": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
