@@ -1,0 +1,26 @@
+// EntityCollection obsahuje pouze runtime data; typy a lokalizace jsou v metadatech.
+// id entity je GUID konkretniho zaznamu; attributes jsou nativni JSON hodnoty.
+// Null znamena explicitne prazdnou hodnotu; vynechane pole se bude resit samostatne.
+{
+  "entityName": "contact",
+  "entities": [
+    {
+      "logicalName": "contact",
+      "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+      "attributes": {
+        "id": "3a8cf720-fc91-4db8-9d8d-7f2bde49bd18",
+        "firstName": "Jana",
+        "lastName": "Nováková",
+        "address": "Brno",
+        "description": null
+      }
+    }
+  ],
+  "paging": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 1,
+    "totalPages": 1,
+    "moreRecords": false
+  }
+}
