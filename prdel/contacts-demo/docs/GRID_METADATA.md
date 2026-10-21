@@ -136,12 +136,6 @@
     }
   },
   "localization": {
-    "defaultLcid": 1029,
-    "supportedLcids": [
-      1029,
-      1033,
-      1031
-    ],
     "labels": {
       "1029": {
         "title": "Moje kontakty",
@@ -189,9 +183,9 @@
 
 ## Lokalizace všech popisků pomocí LCID
 
-- `localization.defaultLcid` je výchozí LCID, zde `1029` (cs-CZ). `supportedLcids` uvádí podporované jazykové varianty. LCID je číselný Windows/Microsoft identifikátor, nikoli přímo ISO kód; například `1029` = cs-CZ, `1033` = en-US, `1031` = de-DE, `1051` = sk-SK.
+- Výchozí LCID a seznam podporovaných LCID jsou definovány **pouze centrálně** v kořenovém `app.config.json` (`localization.defaultLcid`, `localization.supportedLcids`), nikoli v metadatech jednotlivých gridů nebo formulářů. LCID je číselný Windows/Microsoft identifikátor, nikoli přímo ISO kód; například `1029` = cs-CZ, `1033` = en-US, `1031` = de-DE, `1051` = sk-SK.
 - `localization.labels` obsahuje lokalizované texty gridu: titulek, ovládání stránkování, počty záznamů, stav výběru, prázdné výsledky, navigační tlačítka a placeholder filtrů. `columns[].labels` obsahuje překlady nadpisu konkrétního sloupce. Všechna lokalizovaná pole používají stejný vzor mapy `{ "1029": "...", "1033": "..." }` (LCID je klíč JSON objektu, tedy řetězec).
-- Aktuální LCID poskytne aplikační kontext uživatele, nikoli jednotlivý grid. Pokud pro daný text chybí překlad v aktuálním LCID, použije se překlad `defaultLcid`; pokud chybí i ten, jde o neplatnou definici metadat. Pro každý lokalizovaný text je tedy výchozí jazyk povinný.
+- Aktuální LCID poskytne aplikační kontext uživatele, nikoli jednotlivý grid. Pokud pro daný text chybí překlad v aktuálním LCID, použije se překlad `app.config.json.localization.defaultLcid`; pokud chybí i ten, jde o neplatnou definici metadat. Pro každý lokalizovaný text je tedy výchozí jazyk povinný. Aktuální LCID uživatele musí být jedním z `supportedLcids`; pokud není, použije se centrální `defaultLcid`.
 - Technické názvy polí, ID, REST parametry, enumy a datové hodnoty se **nepřekládají**. Stejný mechanismus lokalizace se později použije pro formuláře a dialogy.
 - Popisky patřící rendereru, které nejsou v konkrétním gridu uvedeny, musí být definovány v samostatném sdíleném lokalizačním katalogu; žádný uživatelsky viditelný text se nesmí napevno zapisovat do rendereru. Konkrétní schéma sdíleného katalogu bude navrženo zvlášť.
 
