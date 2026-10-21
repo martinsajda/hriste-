@@ -86,3 +86,54 @@ Pro všechny model-driven komponenty je referenčním doménovým modelem **Micr
 **Kompatibilita:** Existující konkrétní CRUD endpointy Contacts Demo v [API.md](API.md) mohou zůstat aplikačním REST kontraktem prototypu; nejsou však vzorem ani povinností pro všechny entity či další projekty. Starší diagramy s `DataProvider` nebo „jednotným REST kontraktem“ je nutné vykládat jako jednotnou **sémantiku datového modelu**, nikoli jako povinnou sadu CRUD metod nebo identických URL. Přesný budoucí formát payloadů a migrace legacy DTO jsou samostatné úkoly.
 
 **Odložené téma:** Zápis jedné logické entity do více nezávislých zdrojů a handling částečných selhání je evidován v [ARCHITECTURE_TODO.md](ARCHITECTURE_TODO.md), úkol A01; tímto ADR se neřeší.
+
+
+## ADR-2026-10-21: JSON jako jediný kanonický formát metadat a model-driven dat
+
+**Stav: SCHVÁLENO — závazné, klíčové architektonické rozhodnutí.**
+
+### Historie a motivace
+
+Původní návrh počítal s metadatovými popisy v XML. Tato úvaha vycházela z historického použití XML v Dynamics CRM a z možnosti přehledného ručního zápisu pojmenovaných elementů a atributů. Po zvážení cílové architektury byl **zvolen výhradně JSON**: framework je určen především pro webové renderery v JavaScriptu, konkrétní business REST API a přenositelné backendy v Node.js, .NET a PHP. Podpora dvou rovnocenných metadatových formátů by zbytečně přidala parsování, mapování, dvojí validaci, testování a riziko rozdílné sémantiky.
+
+**Nejde o tvrzení, že JSON má obecně více vyjadřovacích možností než XML.** XML má například atributy, namespaces a XSD; pro náš objektový model a webový runtime je však JSON přirozenější a provozně jednodušší.
+
+### Závazná pravidla
+
+1. **Jediný kanonický runtime a výměnný formát** metadat model-driven frameworku a jeho standardizovaných typovaných datových kontraktů je **validní JSON**. XML není alternativním formátem těchto kontraktů; neimplementovat paralelní XML definice, XML serializaci metadat ani XML parser jako součást rendererů.
+2. **JavaScriptový frontend** načítá JSON pomocí `fetch()` a `Response.json()` (případně `JSON.parse()`) přímo do nativních JS objektů; serializuje přes `JSON.stringify()`. Nepřidávat mezikrok XML → DOM → aplikační objekt.
+3. **Backendová nezávislost:** Node.js, ASP.NET Core/.NET (např. `System.Text.Json` nebo Newtonsoft.Json) a PHP používají své JSON serializéry/deserializéry a zachovávají **stejnou dokumentovanou sémantiku a verzovaný wire kontrakt**. Výběr knihovny není součástí veřejného kontraktu.
+4. **JSON je serializace, nikoli samotný doménový model.** Sémantika entit, atributů, vazeb a hodnotových typů zůstává založena na `Microsoft.Xrm.Sdk` a `Microsoft.Xrm.Sdk.Metadata`; JSON ji bezztrátově reprezentuje podle [METADATA_MODEL.md](METADATA_MODEL.md). Nesmí dojít ke ztrátě typů `EntityReference`, `Money`, `OptionSetValue`, `AliasedValue` ani přesnosti čísel.
+5. **JSONC výhradně pro dokumentaci a příklady:** komentáře lze psát do `jsonc` ukázek; soubory načítané runtime musí být validní JSON bez komentářů a trailing commas. JSONC není druhý běhový formát.
+6. **Validace a verzování:** struktury metadat a typovaných dat postupně specifikovat pomocí **JSON Schema**, doplnit sémantickou validaci a testy kompatibility; změny wire kontraktu verzovat. JSON Schema nenahrazuje všechna doménová pravidla SDK.
+7. **Oddělené vrstvy:** entity metadata, záznamy (`Entity`/`EntityCollection`), layout formulářů/gridů a konfigurace aplikačních HTTP operací jsou samostatné logické kontrakty; všechny mohou mít JSON reprezentaci, ale nesmějí se slučovat do jednoho monolitického dokumentu jen kvůli formátu.
+8. **Externí XML je povolené pouze za integrační hranicí.** Například Dataverse FetchXML, XML odpověď externí služby nebo legacy XML konfigurace může používat interní backend/provider. Ten provede potřebnou transformaci do kanonického JSON modelu. XML se tím nestává veřejným metadatovým kontraktem ani závislostí rendereru.
+9. **Editace metadat:** Ruční editace JSON je možná; vývojářské nástroje mohou poskytovat validaci, nápovědu a automatické doplňování podle JSON Schema. Budoucí vizuální editor může upravovat stejné logické objekty a ukládat JSON; nepředpokládá se návrat k XML kvůli pohodlí editace.
+
+### Praktický příklad (runtime JSON)
+
+```json
+{
+  "logicalName": "contact",
+  "primaryIdAttribute": "contactid",
+  "attributes": [
+    {
+      "@type": "StringAttributeMetadata",
+      "logicalName": "firstname",
+      "attributeType": "String",
+      "maxLength": 100
+    }
+  ]
+}
+```
+
+```javascript
+const response = await fetch("/metadata/contact.json");
+if (!response.ok) throw new Error("Metadata request failed");
+const metadata = await response.json();
+console.log(metadata.logicalName);
+```
+
+Příklad ukazuje pouze princip nativního načítání; úplná metadata a jejich validace se řídí [METADATA_MODEL.md](METADATA_MODEL.md) a budoucím JSON Schema.
+
+**Důsledek pro implementaci:** XML parser, XSD ani dvojí reprezentace metadat nejsou požadavkem frameworku. JSON je jednotná serializační hranice mezi metadatovým modelem, renderery a aplikačními REST kontrakty, aniž by tím vzniklo generické CRUD API (viz předchozí ADR).
