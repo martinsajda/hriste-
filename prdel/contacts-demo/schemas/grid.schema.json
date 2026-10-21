@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/contacts-demo/schemas/grid.schema.json",
   "title": "Universal Grid Metadata v2",
   "description": "Strojově čitelný kontrakt gridu; sémantické vazby mezi sloupci, akcemi a endpointy vyžadují další validaci.",
   "type": "object",
