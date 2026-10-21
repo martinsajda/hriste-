@@ -28,6 +28,32 @@ SQLite (data/contacts.db)
 
 Aplikace bude běžet výhradně lokálně. Backend bude obsluhovat jak REST API, tak statické soubory frontendu, takže není nutný samostatný webový server ani frontendový bundler.
 
+### Graf architektury
+
+Následující diagram je ve formátu Mermaid a GitHub jej vykreslí přímo v README.
+
+```mermaid
+flowchart TB
+    U["Uživatel / Safari"]
+    FE["Frontend<br/>statické HTML + CSS + JavaScript"]
+    HTTP["Lokální HTTP server<br/>Node.js · 127.0.0.1:3000"]
+    API["REST API<br/>/api/contacts · telefonní čísla"]
+    DBP["Databázové providery<br/>node:sqlite"]
+    DB[("SQLite<br/>data/contacts.db")]
+    C["Contacts"]
+    T["TelephoneNumbers"]
+
+    U --> FE
+    FE <-->|"HTTP / JSON"| HTTP
+    HTTP -->|"statické soubory"| FE
+    HTTP --> API
+    API --> DBP
+    DBP --> DB
+    DB -.-> C
+    DB -.-> T
+    C -->|"1 : N (ContactId)"| T
+```
+
 ## Rozsah demonstrační aplikace
 
 Cílový datový model bude obsahovat dvě tabulky:
