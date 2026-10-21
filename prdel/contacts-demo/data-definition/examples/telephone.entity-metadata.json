@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "logicalName": "telephone",
+  "collectionName": "telephones",
+  "primaryIdAttribute": "id",
+  "primaryNameAttribute": "phoneNumber",
+  "displayNames": {
+    "1029": "Telefon",
+    "1031": "Telefon",
+    "1033": "Telephone"
+  },
+  "displayCollectionNames": {
+    "1029": "Telefonní čísla",
+    "1031": "Telefonnummern",
+    "1033": "Telephone numbers"
+  },
+  "attributes": [
+    {
+      "logicalName": "id",
+      "type": "guid",
+      "required": true,
+      "primaryId": true,
+      "readOnly": true,
+      "labels": {
+        "1029": "ID",
+        "1031": "ID",
+        "1033": "ID"
+      }
+    },
+    {
+      "logicalName": "contactId",
+      "type": "lookup",
+      "required": true,
+      "targets": [
+        "contact"
+      ],
+      "labels": {
+        "1029": "Kontakt",
+        "1031": "Kontakt",
+        "1033": "Contact"
+      }
+    },
+    {
+      "logicalName": "type",
+      "type": "optionSet",
+      "required": true,
+      "optionSet": "telephoneType",
+      "labels": {
+        "1029": "Typ",
+        "1031": "Typ",
+        "1033": "Type"
+      }
+    },
+    {
+      "logicalName": "phoneNumber",
+      "type": "string",
+      "required": true,
+      "labels": {
+        "1029": "Telefonní číslo",
+        "1031": "Telefonnummer",
+        "1033": "Phone number"
+      }
+    },
+    {
+      "logicalName": "description",
+      "type": "string",
+      "required": false,
+      "labels": {
+        "1029": "Popis",
+        "1031": "Beschreibung",
+        "1033": "Description"
+      }
+    }
+  ]
+}
