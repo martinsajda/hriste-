@@ -247,3 +247,14 @@ Jeden agent řeší databázi, REST API, metadata-driven frontend i testování 
 ## Bezpečnost a stav
 
 Určeno pro lokální vývoj a demonstraci, bez autentizace; nevystavovat veřejně. Nejsou potřeba cloudové databáze ani přístup k osobním účtům. Projekt je ve fázi dokončování specifikace JSON metadat; nová implementace podle schválených kontraktů zatím nebyla ověřena. **Ve Windows a v prohlížeči zatím nebyla aplikace v tomto projektu spuštěna a otestována.**
+
+## Grid metadata v2 — příklady a schémata
+
+- [`metadata/contacts.grid.json`](metadata/contacts.grid.json) — příklad skutečné JSON definice gridu kontaktů.
+- [`metadata/contacts.grid.jsonc`](metadata/contacts.grid.jsonc) — stejný návrh s komentáři pro čtení a revizi; není určen k přímému načítání standardním JSON parserem.
+- [`metadata/telephones.grid.json`](metadata/telephones.grid.json) — příklad gridu telefonních čísel.
+- [`schemas/grid.schema.json`](schemas/grid.schema.json), [`schemas/grid-column.schema.json`](schemas/grid-column.schema.json), [`schemas/grid-view.schema.json`](schemas/grid-view.schema.json) — strojově čitelný kontrakt Draft 2020-12.
+- [`schemas/README.md`](schemas/README.md) — pravidla validace, omezení a návaznosti.
+- [`docs/GRID_METADATA.md`](docs/GRID_METADATA.md) — koncepce v1/v2 a REST kontrakt.
+
+**Stav:** připraveno k revizi; neznamená to implementaci rendereru, POST search, exportu nebo persistence pohledů.
