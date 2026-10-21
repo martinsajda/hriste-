@@ -11,7 +11,7 @@ Uživatel zadává požadavky přirozeným jazykem, často hlasovým diktování
 1. `README.md` — účel aplikace, UI a celkové zadání (schválené kontrakty mají přednost před ilustrativními ukázkami).
 2. `docs/DATOVY_MODEL.md` — závazné schéma dvou entit, GUID a vztah 1:N.
 3. `docs/API.md` — závazný REST API v1 kontrakt: 5 CRUD operací na entitu, celkem 10, a schválené volitelné stránkování seznamů.
-4. `docs/GRID_METADATA.md` — schválená metadata gridů, klientské a serverové stránkování.
+4. `docs/GRID_METADATA.md` — schválený kontrakt v1/v2, klientské a serverové stránkování. Formální schémata: `schemas/*.schema.json`; příklady: `metadata/*.grid.json`, komentovaný vzor: `metadata/contacts.grid.jsonc`. Při změně metadat udržuj tyto soubory v souladu; `.jsonc` není běhová konfigurace.
 5. `app.config.json` — jediný zdroj výchozího LCID a podporovaných jazyků pro všechny gridy a formuláře.
 6. `docs/ARCHITECTURE.md` — závazné technologické vrstvy a provoz.
 7. `DEPLOY.md` — odsouhlasený směr budoucího veřejného nasazení (bez dosud určených detailů).
