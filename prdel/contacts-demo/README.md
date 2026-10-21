@@ -374,11 +374,11 @@ Po spuštění `npm start`:
 
 Ukončením Node.js procesu (`Ctrl+C`) skončí také práce s SQLite; data zůstávají uložená v `data/contacts.db`. Při dalším spuštění se stejný soubor znovu otevře.
 
-## Agenti
+## Vývojový režim — jeden agent
 
-Projekt počítá s jedním hlavním Codex orchestrátorem a čtyřmi rolemi: DB, Backend, Frontend a QA.
+První fázi projektu vyvíjí **jeden univerzální AI agent**, bez multiagentní orchestrace a bez delegování na DB/Backend/Frontend/QA podagenty. Zadání lze diktovat ChatGPT, který může přímo upravovat dokumentaci a zdrojové soubory na GitHubu; později lze použít lokální Codex CLI se stejným repozitářem a pravidly v `AGENTS.md`.
 
-`AGENTS.md` je vstup pro hlavního orchestrátora, `agents/*.md` obsahují pravidla čtyř specializací. Pouhé MD soubory agenty samy nespouštějí. Codex musí mít nakonfigurovanou odpovídající podporu delegování.
+Historické instrukce v `agents/*.md` nejsou aktivní. Jeden agent řeší databázi, REST API, metadata-driven frontend i testování postupně. Závazné kontrakty jsou `docs/DATOVY_MODEL.md` a `docs/API.md`. Binární dokumentace se ukládá na Google Drive do `Context Demo/Dokumentace/Návrh`.
 
 ## Bezpečnost a stav
 
